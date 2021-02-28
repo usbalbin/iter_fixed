@@ -6,6 +6,18 @@
 use core::{array, slice};
 use std::iter;
 
+pub fn foo() {
+    // Same as the last one that fails to compile in tests/test.rs
+    // however this compiles fine:
+    let _res: [_; 2] = [1u32, 2, 3, 4]
+        .into_iter_fixed()
+        .zip([4u32, 3, 2, 1])
+        .map(|(a, b)| a + b)
+        .skip::<1>()
+        .take::<2>()
+        .collect();
+}
+
 pub unsafe trait IntoIteratorFixed<I: Iterator, const N: usize> {
     fn into_iter_fixed(self) -> IteratorFixed<I, N>;
 }
