@@ -3,37 +3,37 @@
 #![feature(const_evaluatable_checked)]
 #![feature(array_map)]
 
-use core::{array, slice};
 use std::iter;
 
-pub unsafe trait IntoIteratorFixed<I: Iterator, const N: usize> {
-    fn into_iter_fixed(self) -> IteratorFixed<I, N>;
-}
+mod from;
+mod helpers;
+mod into;
 
-// IteratorFixed implements IntoIteratorFixed
-unsafe impl<I: Iterator, const N: usize> IntoIteratorFixed<I, N> for IteratorFixed<I, N>
-where
-    IteratorFixed<I, N>: IntoIterator,
-{
-    fn into_iter_fixed(self) -> IteratorFixed<I, N> {
-        self
-    }
-}
+pub use from::FromIteratorFixed;
+use helpers::{min, sub_or_zero};
+pub use into::IntoIteratorFixed;
 
-// Safety: array::IntoIter::new([T; N]) always yields N elements
-unsafe impl<T, const N: usize> IntoIteratorFixed<array::IntoIter<T, N>, N> for [T; N] {
-    fn into_iter_fixed(self) -> IteratorFixed<array::IntoIter<T, N>, N> {
-        unsafe { IteratorFixed::from_iter(array::IntoIter::new(self)) }
-    }
-}
-
-// Safety: [T; N]::iter always yields N elements
-unsafe impl<'a, T, const N: usize> IntoIteratorFixed<slice::Iter<'a, T>, N> for &'a [T; N] {
-    fn into_iter_fixed(self) -> IteratorFixed<slice::Iter<'a, T>, N> {
-        unsafe { IteratorFixed::from_iter(self.iter()) }
-    }
-}
-
+/// Iterator of fixed size
+///
+/// A type that can be usen a bit like an ordinary Iterator but with a compile time guaranteed
+/// length. This enables us to turn them back into collections of fixed size without having to
+/// perform unnecessary checks during run time.
+///
+/// Just like Iterator, IteratorFixed provides a lot of methods like:
+///
+/// * `map`
+/// * `inspect`
+/// * `skip`
+/// * `step_by`
+/// * `chain`
+/// * `enumerate`
+/// * `take`
+/// * `zip`
+/// * `rev`
+/// * `copied`
+/// * `cloned`
+///
+/// however it does not support methods like `filter` or `take_while` which will affect the length during runtime.
 pub struct IteratorFixed<I: Iterator, const N: usize> {
     inner: I,
 }
@@ -184,35 +184,6 @@ where
         unimplemented!()
     }
     */
-}
-
-pub const fn min(a: usize, b: usize) -> usize {
-    if a < b {
-        a
-    } else {
-        b
-    }
-}
-
-pub const fn sub_or_zero(a: usize, b: usize) -> usize {
-    if a > b {
-        a - b
-    } else {
-        0
-    }
-}
-
-pub trait FromIteratorFixed<I: Iterator, const N: usize> {
-    fn from_iter_fixed(iter_fixed: IteratorFixed<I, N>) -> Self;
-}
-
-impl<I: Iterator, const N: usize> FromIteratorFixed<I, N> for [<I as Iterator>::Item; N] {
-    fn from_iter_fixed(iter_fixed: IteratorFixed<I, N>) -> Self {
-        let IteratorFixed { inner: mut it } = iter_fixed;
-        // We know that it will yield N elements due to it originating from an IteratorFixed
-        // of size N
-        [(); N].map(|_| it.next().unwrap())
-    }
 }
 
 impl<T, I: Iterator<Item = T>, const N: usize> IntoIterator for IteratorFixed<I, N> {
