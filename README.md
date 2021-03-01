@@ -2,14 +2,17 @@
 
 *This project is inspired by @leonardo-m 's idea https://github.com/rust-lang/rust/issues/80094#issuecomment-749260428*
 
-**This code is currently very experimental and requires several unstable features and thus requires a nightly compiler**. Type names, function names, trait
-bounds etc. are all very much subject to change.
+**This code is currently very experimental and requires several unstable
+features and thus requires a nightly compiler**. Type names, function names,
+trait bounds etc. are all very much subject to change.
 
-Provides a trait for turning collections of fixed size, like arrays, into `IteratorFixed` which can be used a bit
-like an ordinary `Iterator` but with a compile time guaranteed length. This enables us to turn them back into collections
-of fixed size without having to perform unnecessary checks during run time.
+Provides a type and traits for turning collections of fixed size, like arrays,
+into `IteratorFixed` which can be used a bit like an ordinary `Iterator` but
+with a compile time guaranteed length. This enables us to turn them back into
+collections of fixed size without having to perform unnecessary checks during
+run time.
 
-Just like `Iterator`, `IteratorFixed` provides adapters like:
+Just like `Iterator`, `IteratorFixed` provides methods like:
 
 * `map`
 * `inspect`
@@ -23,7 +26,7 @@ Just like `Iterator`, `IteratorFixed` provides adapters like:
 * `copied`
 * `cloned`
 
-however it does not support adapter like `filter` or `take_while` which will affect the length during runtime.
+however it does not support methods like `filter` or `take_while` which will affect the length during runtime.
 
 # Examples
 
