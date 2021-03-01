@@ -43,3 +43,10 @@ see examples/vector.rs
 ## Matrix
 
 see examples/matrix.rs
+
+# License
+
+`iter_fixed` is distributed under the terms of both the MIT license and
+the Apache License (Version 2.0).
+
+See LICENSE-APACHE, and LICENSE-MIT for details.
