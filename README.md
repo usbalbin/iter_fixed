@@ -2,7 +2,8 @@
 
 *This project is inspired by @leonardo-m 's idea https://github.com/rust-lang/rust/issues/80094#issuecomment-749260428*
 
-**This code is currently very experimental and requires several unstable features and thus requires a nightly compiler**
+**This code is currently very experimental and requires several unstable features and thus requires a nightly compiler**. Type names, function names, trait
+bounds etc. are all very much subject to change.
 
 Provides a trait for turning collections of fixed size, like arrays, into `IteratorFixed` which can be used a bit
 like an ordinary `Iterator` but with a compile time guaranteed length. This enables us to turn them back into collections
