@@ -3,6 +3,9 @@ name = "iter_fixed"
 version = "0.1.0"
 authors = ["Albin Hedman <albin9604@gmail.com>"]
 edition = "2018"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/usbalbin/iter_fixed/"
+description = "Iterator of fixed length"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
