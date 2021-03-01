@@ -26,10 +26,7 @@ impl<T, const R: usize, const K: usize> Matrix<T, R, K> {
 
 fn main() {
     let m = Matrix {
-        rows: [
-            [1, 2, 3],
-            [4, 5, 6]
-        ],
+        rows: [[1, 2, 3], [4, 5, 6]],
     };
 
     assert_eq!(m.get_row(0), [&1, &2, &3]);
