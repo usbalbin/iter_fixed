@@ -6,20 +6,18 @@
 use core::{array, slice};
 use std::iter;
 
-pub fn foo() {
-    // Same as the last one that fails to compile in tests/test.rs
-    // however this compiles fine:
-    let _res: [_; 2] = [1u32, 2, 3, 4]
-        .into_iter_fixed()
-        .zip([4u32, 3, 2, 1])
-        .map(|(a, b)| a + b)
-        .skip::<1>()
-        .take::<2>()
-        .collect();
-}
-
 pub unsafe trait IntoIteratorFixed<I: Iterator, const N: usize> {
     fn into_iter_fixed(self) -> IteratorFixed<I, N>;
+}
+
+// IteratorFixed implements IntoIteratorFixed
+unsafe impl<I: Iterator, const N: usize> IntoIteratorFixed<I, N> for IteratorFixed<I, N>
+where
+    IteratorFixed<I, N>: IntoIterator,
+{
+    fn into_iter_fixed(self) -> IteratorFixed<I, N> {
+        self
+    }
 }
 
 // Safety: array::IntoIter::new([T; N]) always yields N elements
@@ -48,8 +46,10 @@ where
     /// Caller has to guarantee that the given iterator will yield exactly N elements
     ///
     /// TODO: Would it be ok if it generated more elements?
-    pub unsafe fn from_iter(i: I) -> Self {
-        IteratorFixed { inner: i }
+    pub unsafe fn from_iter<II: IntoIterator<IntoIter = I>>(i: II) -> Self {
+        IteratorFixed {
+            inner: i.into_iter(),
+        }
     }
 
     pub fn map<U, F: FnMut(<I as Iterator>::Item) -> U>(
@@ -70,6 +70,7 @@ where
         }
     }
 
+    // TODO: what should happen when SKIP > N?
     pub fn skip<const SKIP: usize>(self) -> IteratorFixed<iter::Skip<I>, { sub_or_zero(N, SKIP) }> {
         IteratorFixed {
             inner: self.inner.skip(SKIP),
@@ -85,7 +86,7 @@ where
     pub fn chain<IIF, I2, const M: usize>(self, other: IIF) -> IteratorFixed<iter::Chain<I, I2>, N>
     where
         IIF: IntoIteratorFixed<I2, M>,
-        I2: Iterator<Item = <I as Iterator>::Item>,
+        I2: Iterator<Item = <I as IntoIterator>::Item>,
     {
         IteratorFixed {
             inner: self.inner.chain(other.into_iter_fixed().inner),
@@ -104,10 +105,11 @@ where
         }
     }
 
-    pub fn zip<U, IIF: IntoIteratorFixed<I2, N>, I2: Iterator<Item = U>>(
-        self,
-        other: IIF,
-    ) -> IteratorFixed<iter::Zip<I, I2>, N> {
+    pub fn zip<U, IIF, I2>(self, other: IIF) -> IteratorFixed<iter::Zip<I, I2>, N>
+    where
+        IIF: IntoIteratorFixed<I2, N>,
+        I2: Iterator<Item = U>,
+    {
         IteratorFixed {
             inner: self.inner.zip(other.into_iter_fixed().inner),
         }
@@ -166,6 +168,7 @@ where
     I: Iterator<Item = IteratorFixed<I2, M>>,
     I2: Iterator,
 {
+    // TODO: Would it be better to have `I: Iterator<Item = IntoIteratorFixed`?
     pub fn flatten(self) -> IteratorFixed<iter::Flatten<I>, { M * N }> {
         IteratorFixed {
             inner: self.inner.flatten(),
@@ -173,14 +176,14 @@ where
     }
 
     /*
-     pub fn flat_map(self, f: F) -> FlatMap<Self, U, F>
-     where
-         F: FnMut(Self::Item) -> U,
-    pub      U: IntoIterator,
-     {
-         unimplemented!()
-     }
-     */
+    pub fn flat_map(self, f: F) -> FlatMap<Self, U, F>
+    where
+        F: FnMut(Self::Item) -> U,
+        U: IntoIterator,
+    {
+        unimplemented!()
+    }
+    */
 }
 
 pub const fn min(a: usize, b: usize) -> usize {
@@ -205,7 +208,7 @@ pub trait FromIteratorFixed<I: Iterator, const N: usize> {
 
 impl<I: Iterator, const N: usize> FromIteratorFixed<I, N> for [<I as Iterator>::Item; N] {
     fn from_iter_fixed(iter_fixed: IteratorFixed<I, N>) -> Self {
-        let mut it = iter_fixed.into_iter();
+        let IteratorFixed { inner: mut it } = iter_fixed;
         // We know that it will yield N elements due to it originating from an IteratorFixed
         // of size N
         [(); N].map(|_| it.next().unwrap())
