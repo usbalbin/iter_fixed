@@ -1,6 +1,6 @@
 use crate::IteratorFixed;
 
-use std::{array, slice};
+use core::{array, slice};
 
 /// Conversion into an [`IteratorFixed`].
 ///
