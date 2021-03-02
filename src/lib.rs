@@ -1,9 +1,10 @@
+#![no_std]
 #![allow(incomplete_features)]
 #![feature(const_generics)]
 #![feature(const_evaluatable_checked)]
 #![feature(array_map)]
 
-use std::iter;
+use core::iter;
 
 mod from;
 mod helpers;
