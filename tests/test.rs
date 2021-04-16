@@ -16,4 +16,10 @@ fn test() {
         .collect();
 
     assert_eq!(res, [5, 5]);
+
+    let foo: [(_, _); 3] = [1, 2, 3]
+        .into_iter_fixed()
+        .zip(core::iter::repeat(42))
+        .collect();
+    assert_eq!(foo, [(1, 42), (2, 42), (3, 42)]);
 }
