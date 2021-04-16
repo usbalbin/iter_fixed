@@ -1,6 +1,6 @@
 use crate::IteratorFixed;
 
-use core::{array, slice};
+use core::{array, iter, slice};
 
 /// Conversion into an [`IteratorFixed`].
 ///
@@ -36,5 +36,14 @@ unsafe impl<T, const N: usize> IntoIteratorFixed<array::IntoIter<T, N>, N> for [
 unsafe impl<'a, T, const N: usize> IntoIteratorFixed<slice::Iter<'a, T>, N> for &'a [T; N] {
     fn into_iter_fixed(self) -> IteratorFixed<slice::Iter<'a, T>, N> {
         unsafe { IteratorFixed::from_iter(self.iter()) }
+    }
+}
+
+// Safety: iter::repeat(_).take(N) always yields N elements
+unsafe impl<T: Clone, const N: usize> IntoIteratorFixed<iter::Take<iter::Repeat<T>>, N>
+    for iter::Repeat<T>
+{
+    fn into_iter_fixed(self) -> IteratorFixed<iter::Take<iter::Repeat<T>>, N> {
+        unsafe { IteratorFixed::from_iter(self.take(N)) }
     }
 }
