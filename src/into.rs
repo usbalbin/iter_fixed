@@ -19,7 +19,7 @@ pub unsafe trait IntoIteratorFixed<I: Iterator, const N: usize> {
     /// use iter_fixed::IntoIteratorFixed;
     ///
     /// let two_four_six = [1, 2, 3].into_iter_fixed().map(|x| 2 * x);
-    /// 
+    ///
     /// let a: [i32; 3] = two_four_six.collect();
     /// assert_eq!(a, [2, 4, 6]);
     /// ```
@@ -39,14 +39,13 @@ where
     /// use iter_fixed::IntoIteratorFixed;
     /// let one_one = [1, 1].into_iter_fixed();
     /// let zipped: [_; 2] = [1, 2].into_iter_fixed().zip(one_one).collect();
-    /// 
+    ///
     /// assert_eq!(zipped, [(1, 1), (2, 1)]);
     /// ```
     fn into_iter_fixed(self) -> IteratorFixed<I, N> {
         self
     }
 }
-
 
 unsafe impl<T, const N: usize> IntoIteratorFixed<array::IntoIter<T, N>, N> for [T; N] {
     /// Creates a fixed size iterator from an array.
@@ -56,7 +55,7 @@ unsafe impl<T, const N: usize> IntoIteratorFixed<array::IntoIter<T, N>, N> for [
     /// use iter_fixed::IntoIteratorFixed;
     ///
     /// let two_four_six = [1, 2, 3].into_iter_fixed().map(|x| 2 * x);
-    /// 
+    ///
     /// let a: [i32; 3] = two_four_six.collect();
     /// assert_eq!(a, [2, 4, 6]);
     /// ```
@@ -66,7 +65,6 @@ unsafe impl<T, const N: usize> IntoIteratorFixed<array::IntoIter<T, N>, N> for [
     }
 }
 
-
 unsafe impl<'a, T, const N: usize> IntoIteratorFixed<slice::Iter<'a, T>, N> for &'a [T; N] {
     /// Creates a fixed size iterator from a borrowed array.
     ///
@@ -75,7 +73,7 @@ unsafe impl<'a, T, const N: usize> IntoIteratorFixed<slice::Iter<'a, T>, N> for 
     /// use iter_fixed::IntoIteratorFixed;
     ///
     /// let two_four_six = [1, 2, 3].into_iter_fixed().map(|x| 2 * x);
-    /// 
+    ///
     /// let a: [i32; 3] = two_four_six.collect();
     /// assert_eq!(a, [2, 4, 6]);
     /// ```
@@ -96,7 +94,7 @@ unsafe impl<T: Clone, const N: usize> IntoIteratorFixed<iter::Take<iter::Repeat<
     /// use iter_fixed::IntoIteratorFixed;
     ///
     /// let one_one_one = iter::repeat(1).into_iter_fixed();
-    /// 
+    ///
     /// let a: [i32; 3] = one_one_one.collect();
     /// assert_eq!(a, [1, 1, 1]);
     /// ```

@@ -152,7 +152,7 @@ where
     /// use iter_fixed::IntoIteratorFixed;
     ///
     /// let two_four_six = [1, 2, 3].into_iter_fixed().map(|x| 2 * x);
-    /// 
+    ///
     /// let a: [i32; 3] = two_four_six.collect();
     /// assert_eq!(a, [2, 4, 6]);
     /// ```
