@@ -32,12 +32,12 @@ however it does not support methods like `filter` or `take_while` which will aff
 
 ## Toy example
 
-```
+```rust
 // zip together two arrays of length 4, turn the elements wise sums of the
 // two middle elements into an array of size 2
-let res: [_; 2] = [1u32, 2, 3, 4]
+let res: [_; 2] = [1, 2, 3, 4]
     .into_iter_fixed()
-    .zip([4u32, 3, 2, 1])
+    .zip([4, 3, 2, 1])
     .map(|(a, b)| a + b)
     .skip::<1>()
     .take::<2>()
@@ -47,11 +47,11 @@ assert_eq!(res, [5, 5]);
 ```
 
 ## Vector
-see examples/vector.rs
+see [examples/vector.rs](https://github.com/usbalbin/iter_fixed/blob/master/examples/vector.rs)
 
 ## Matrix
 
-see examples/matrix.rs
+see [examples/matrix.rs](https://github.com/usbalbin/iter_fixed/blob/master/examples/matrix.rs)
 
 # License
 `iter_fixed` is distributed under the terms of both the MIT license and

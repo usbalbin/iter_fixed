@@ -46,13 +46,14 @@ where
     /// # Safety
     /// Caller has to guarantee that the given iterator will yield exactly N elements
     ///
-    /// TODO: Would it be ok if it generated more elements?
+    // TODO: Would it be ok if it generated more elements?
     pub unsafe fn from_iter<II: IntoIterator<IntoIter = I>>(i: II) -> Self {
         IteratorFixed {
             inner: i.into_iter(),
         }
     }
 
+    /// See [`core::iter::Iterator::map`]
     pub fn map<U, F: FnMut(<I as Iterator>::Item) -> U>(
         self,
         p: F,
@@ -62,6 +63,7 @@ where
         }
     }
 
+    /// See [`core::iter::Iterator::inspect`]
     pub fn inspect<F: FnMut(&<I as Iterator>::Item)>(
         self,
         p: F,
@@ -72,18 +74,21 @@ where
     }
 
     // TODO: what should happen when SKIP > N?
+    /// See [`core::iter::Iterator::skip`]
     pub fn skip<const SKIP: usize>(self) -> IteratorFixed<iter::Skip<I>, { sub_or_zero(N, SKIP) }> {
         IteratorFixed {
             inner: self.inner.skip(SKIP),
         }
     }
 
+    /// See [`core::iter::Iterator::step_by`]
     pub fn step_by<const STEP: usize>(self) -> IteratorFixed<iter::StepBy<I>, { N / STEP }> {
         IteratorFixed {
             inner: self.inner.step_by(STEP),
         }
     }
 
+    /// See [`core::iter::Iterator::chain`]
     pub fn chain<IIF, I2, const M: usize>(self, other: IIF) -> IteratorFixed<iter::Chain<I, I2>, N>
     where
         IIF: IntoIteratorFixed<I2, M>,
@@ -94,18 +99,21 @@ where
         }
     }
 
+    /// See [`core::iter::Iterator::enumerate`]
     pub fn enumerate(self) -> IteratorFixed<iter::Enumerate<I>, N> {
         IteratorFixed {
             inner: self.inner.enumerate(),
         }
     }
 
+    /// See [`core::iter::Iterator::take`]
     pub fn take<const TAKE: usize>(self) -> IteratorFixed<iter::Take<I>, { min(TAKE, N) }> {
         IteratorFixed {
             inner: self.inner.take(TAKE),
         }
     }
 
+    /// See [`core::iter::Iterator::zip`]
     pub fn zip<U, IIF, I2>(self, other: IIF) -> IteratorFixed<iter::Zip<I, I2>, N>
     where
         IIF: IntoIteratorFixed<I2, N>,
@@ -127,6 +135,7 @@ where
     }
     */
 
+    /// See [`core::iter::Iterator::rev`]
     pub fn rev(self) -> IteratorFixed<iter::Rev<I>, N>
     where
         I: iter::DoubleEndedIterator,
@@ -136,6 +145,17 @@ where
         }
     }
 
+    /// Transforms a fixed size iterator into a collection of compile time known size.
+    ///
+    /// Basic usage:
+    /// ```
+    /// use iter_fixed::IntoIteratorFixed;
+    ///
+    /// let two_four_six = [1, 2, 3].into_iter_fixed().map(|x| 2 * x);
+    /// 
+    /// let a: [i32; 3] = two_four_six.collect();
+    /// assert_eq!(a, [2, 4, 6]);
+    /// ```
     pub fn collect<U: FromIteratorFixed<I, N>>(self) -> U {
         U::from_iter_fixed(self)
     }
@@ -145,6 +165,7 @@ impl<'a, I, T: 'a, const N: usize> IteratorFixed<I, N>
 where
     I: Iterator<Item = &'a T>,
 {
+    /// See [`core::iter::Iterator::copied`]
     pub fn copied(self) -> IteratorFixed<iter::Copied<I>, N>
     where
         T: Copy,
@@ -154,6 +175,7 @@ where
         }
     }
 
+    /// See [`core::iter::Iterator::cloned`]
     pub fn cloned(self) -> IteratorFixed<iter::Cloned<I>, N>
     where
         T: Clone,
@@ -170,6 +192,7 @@ where
     I2: Iterator,
 {
     // TODO: Would it be better to have `I: Iterator<Item = IntoIteratorFixed`?
+    /// See [`core::iter::Iterator::flatten`]
     pub fn flatten(self) -> IteratorFixed<iter::Flatten<I>, { M * N }> {
         IteratorFixed {
             inner: self.inner.flatten(),
@@ -187,10 +210,13 @@ where
     */
 }
 
+/// Convert the fixed size iterator into an ordinary [`core::iter::Iterator`]
+/// allowing it to be used with for loop syntax
 impl<T, I: Iterator<Item = T>, const N: usize> IntoIterator for IteratorFixed<I, N> {
     type Item = T;
     type IntoIter = I;
 
+    /// Convert the fixed size iterator into an ordinary [`core::iter::Iterator`]
     fn into_iter(self) -> I {
         self.inner
     }
