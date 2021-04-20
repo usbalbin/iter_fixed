@@ -1,0 +1,20 @@
+on: [push, pull_request]
+
+name: Continuous integration
+
+jobs:
+  fmt:
+    name: Rustfmt
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: nightly
+          override: true
+      - run: rustup component add miri
+      - uses: actions-rs/cargo@v1
+        with:
+          command: miri test
+          args: --all -- --check
