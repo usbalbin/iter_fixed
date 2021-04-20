@@ -1,7 +1,3 @@
-#![allow(incomplete_features)]
-#![feature(const_generics)]
-#![feature(const_evaluatable_checked)]
-
 extern crate iter_fixed;
 
 use iter_fixed::IntoIteratorFixed;

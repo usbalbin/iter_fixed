@@ -1,10 +1,16 @@
 # iter_fixed
 
+![crates.io](https://img.shields.io/crates/v/iter_fixed.svg)
+![docs.rs](https://docs.rs/iter_fixed/badge.svg)
+
 *This project is inspired by @leonardo-m 's idea https://github.com/rust-lang/rust/issues/80094#issuecomment-749260428*
 
-**This code is currently very experimental and requires several unstable
-features and thus requires a nightly compiler**. Type names, function names,
-trait bounds etc. are all very much subject to change.
+**This code is currently very experimental and by default requires a nightly compiler
+in order to work with *the least amount of unsafe code**. Type names, function names,
+trait bounds etc. are all very much subject to change. 
+
+**Please be aware that the `impl FromIteratorFixed for [T; N]` in particular contains lots of
+unsafe code when compiled by a stable compiler without `nightly_features`*
 
 Provides a type and traits for turning collections of fixed size, like arrays,
 into `IteratorFixed` which can be used a bit like an ordinary `Iterator` but
@@ -14,19 +20,27 @@ run time.
 
 Just like `Iterator`, `IteratorFixed` provides methods like:
 
+###### Works on stable rust
 * `map`
 * `inspect`
-* `skip`
-* `step_by`
-* `chain`
 * `enumerate`
-* `take`
 * `zip`
 * `rev`
 * `copied`
 * `cloned`
 
-however it does not support methods like `filter` or `take_while` which will affect the length during runtime.
+###### Requires nightly compiler
+* `skip`
+* `step_by`
+* `chain`
+* `take`
+* `flatten`
+
+however it does not and will never be able to support methods like `filter` or `take_while` which will affect the length during runtime.
+
+## no_std
+
+This crate should work without the full standard library
 
 # Examples
 
