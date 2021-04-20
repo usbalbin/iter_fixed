@@ -13,3 +13,7 @@ pub const fn sub_or_zero(a: usize, b: usize) -> usize {
         0
     }
 }
+
+pub const fn ceiling_div(x: usize, d: usize) -> usize {
+    x / d + (x % d != 0) as usize
+}
