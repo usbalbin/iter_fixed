@@ -82,14 +82,19 @@ where
     }
 
     /// See [`core::iter::Iterator::step_by`]
-    pub fn step_by<const STEP: usize>(self) -> IteratorFixed<iter::StepBy<I>, { ceiling_div(N, STEP) }> {
+    pub fn step_by<const STEP: usize>(
+        self,
+    ) -> IteratorFixed<iter::StepBy<I>, { ceiling_div(N, STEP) }> {
         IteratorFixed {
             inner: self.inner.step_by(STEP),
         }
     }
 
     /// See [`core::iter::Iterator::chain`]
-    pub fn chain<IIF, I2, const M: usize>(self, other: IIF) -> IteratorFixed<iter::Chain<I, I2>, { N + M }>
+    pub fn chain<IIF, I2, const M: usize>(
+        self,
+        other: IIF,
+    ) -> IteratorFixed<iter::Chain<I, I2>, { N + M }>
     where
         IIF: IntoIteratorFixed<I2, M>,
         I2: Iterator<Item = <I as IntoIterator>::Item>,
