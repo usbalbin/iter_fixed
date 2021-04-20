@@ -1,8 +1,9 @@
 #![no_std]
-#![allow(incomplete_features)]
-#![feature(const_generics)]
-#![feature(const_evaluatable_checked)]
-#![feature(array_map)]
+#![cfg_attr(feature = "nightly_features", allow(incomplete_features))]
+#![cfg_attr(
+    feature = "nightly_features",
+    feature(array_map, const_generics, const_evaluatable_checked)
+)]
 
 use core::iter;
 
@@ -10,8 +11,10 @@ mod from;
 mod helpers;
 mod into;
 
-pub use from::FromIteratorFixed;
+#[cfg(feature = "nightly_features")]
 use helpers::{ceiling_div, min, sub_or_zero};
+
+pub use from::FromIteratorFixed;
 pub use into::IntoIteratorFixed;
 
 /// Iterator of fixed size
@@ -75,6 +78,7 @@ where
 
     // TODO: what should happen when SKIP > N?
     /// See [`core::iter::Iterator::skip`]
+    #[cfg(feature = "nightly_features")]
     pub fn skip<const SKIP: usize>(self) -> IteratorFixed<iter::Skip<I>, { sub_or_zero(N, SKIP) }> {
         IteratorFixed {
             inner: self.inner.skip(SKIP),
@@ -82,6 +86,7 @@ where
     }
 
     /// See [`core::iter::Iterator::step_by`]
+    #[cfg(feature = "nightly_features")]
     pub fn step_by<const STEP: usize>(
         self,
     ) -> IteratorFixed<iter::StepBy<I>, { ceiling_div(N, STEP) }> {
@@ -91,6 +96,7 @@ where
     }
 
     /// See [`core::iter::Iterator::chain`]
+    #[cfg(feature = "nightly_features")]
     pub fn chain<IIF, I2, const M: usize>(
         self,
         other: IIF,
@@ -112,6 +118,7 @@ where
     }
 
     /// See [`core::iter::Iterator::take`]
+    #[cfg(feature = "nightly_features")]
     pub fn take<const TAKE: usize>(self) -> IteratorFixed<iter::Take<I>, { min(TAKE, N) }> {
         IteratorFixed {
             inner: self.inner.take(TAKE),
@@ -198,6 +205,7 @@ where
 {
     // TODO: Would it be better to have `I: Iterator<Item = IntoIteratorFixed`?
     /// See [`core::iter::Iterator::flatten`]
+    #[cfg(feature = "nightly_features")]
     pub fn flatten(self) -> IteratorFixed<iter::Flatten<I>, { M * N }> {
         IteratorFixed {
             inner: self.inner.flatten(),
