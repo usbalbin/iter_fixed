@@ -196,13 +196,11 @@ where
     }
 }
 
-impl<I, I2, const N: usize, const M: usize> IteratorFixed<I, N>
+impl<I, IIF, const N: usize, const M: usize> IteratorFixed<I, N>
 where
-    I: Iterator<Item = IteratorFixed<I2, M>>,
-    I2: Iterator,
+    I: Iterator<Item = IIF>,
+    IIF: IntoIteratorFixed<M> + IntoIterator,
 {
-    // TODO: Would it be better to have `I: Iterator<Item = IntoIteratorFixed`?
-    /// See [`core::iter::Iterator::flatten`]
     #[cfg(feature = "nightly_features")]
     pub fn flatten(self) -> IteratorFixed<iter::Flatten<I>, { M * N }> {
         IteratorFixed {
