@@ -11,7 +11,13 @@ use core::{array, iter, slice};
 ///
 /// # Safety
 /// Implementer has to guarantee that the inner iterator will always yield exactly N elements
-pub unsafe trait IntoIteratorFixed<I: Iterator, const N: usize> {
+pub unsafe trait IntoIteratorFixed<const N: usize> {
+    /// The type of the elements being iterated over.
+    type Item;
+
+    /// What will be the underlaying iterator for the IteratorFixed that we turning this into?
+    type IntoIter: Iterator<Item = Self::Item>;
+
     /// Creates a fixed size iterator from a value.
     ///
     /// Basic usage:
@@ -23,14 +29,17 @@ pub unsafe trait IntoIteratorFixed<I: Iterator, const N: usize> {
     /// let a: [i32; 3] = two_four_six.collect();
     /// assert_eq!(a, [2, 4, 6]);
     /// ```
-    fn into_iter_fixed(self) -> IteratorFixed<I, N>;
+    fn into_iter_fixed(self) -> IteratorFixed<Self::IntoIter, N>;
 }
 
 // IteratorFixed implements IntoIteratorFixed
-unsafe impl<I: Iterator, const N: usize> IntoIteratorFixed<I, N> for IteratorFixed<I, N>
+unsafe impl<I: Iterator, const N: usize> IntoIteratorFixed<N> for IteratorFixed<I, N>
 where
     IteratorFixed<I, N>: IntoIterator,
 {
+    type Item = I::Item;
+    type IntoIter = I;
+
     /// `IteratorFixed` implements `IntoIteratorFixed` as a no op. This allows passing an
     /// `IteratorFixed` where an `IntoIteratorFixed` was expected
     ///
@@ -42,12 +51,15 @@ where
     ///
     /// assert_eq!(zipped, [(1, 1), (2, 1)]);
     /// ```
-    fn into_iter_fixed(self) -> IteratorFixed<I, N> {
+    fn into_iter_fixed(self) -> IteratorFixed<Self::IntoIter, N> {
         self
     }
 }
 
-unsafe impl<T, const N: usize> IntoIteratorFixed<array::IntoIter<T, N>, N> for [T; N] {
+unsafe impl<T, const N: usize> IntoIteratorFixed<N> for [T; N] {
+    type Item = T;
+    type IntoIter = array::IntoIter<T, N>;
+
     /// Creates a fixed size iterator from an array.
     ///
     /// Basic usage:
@@ -65,7 +77,10 @@ unsafe impl<T, const N: usize> IntoIteratorFixed<array::IntoIter<T, N>, N> for [
     }
 }
 
-unsafe impl<'a, T, const N: usize> IntoIteratorFixed<slice::Iter<'a, T>, N> for &'a [T; N] {
+unsafe impl<'a, T, const N: usize> IntoIteratorFixed<N> for &'a [T; N] {
+    type Item = &'a T;
+    type IntoIter = slice::Iter<'a, T>;
+
     /// Creates a fixed size iterator from a borrowed array.
     ///
     /// Basic usage:
@@ -77,15 +92,16 @@ unsafe impl<'a, T, const N: usize> IntoIteratorFixed<slice::Iter<'a, T>, N> for 
     /// let a: [i32; 3] = two_four_six.collect();
     /// assert_eq!(a, [2, 4, 6]);
     /// ```
-    fn into_iter_fixed(self) -> IteratorFixed<slice::Iter<'a, T>, N> {
+    fn into_iter_fixed(self) -> IteratorFixed<Self::IntoIter, N> {
         // Safety: [T; N]::iter always yields N elements
         unsafe { IteratorFixed::from_iter(self.iter()) }
     }
 }
 
-unsafe impl<T: Clone, const N: usize> IntoIteratorFixed<iter::Take<iter::Repeat<T>>, N>
-    for iter::Repeat<T>
-{
+unsafe impl<T: Clone, const N: usize> IntoIteratorFixed<N> for iter::Repeat<T> {
+    type Item = T;
+    type IntoIter = iter::Take<iter::Repeat<T>>;
+
     /// Creates a fixed size iterator from an [`core::iter::Repeat`]
     ///
     /// Basic usage:

@@ -97,13 +97,12 @@ where
 
     /// See [`core::iter::Iterator::chain`]
     #[cfg(feature = "nightly_features")]
-    pub fn chain<IIF, I2, const M: usize>(
+    pub fn chain<IIF, const M: usize>(
         self,
         other: IIF,
-    ) -> IteratorFixed<iter::Chain<I, I2>, { N + M }>
+    ) -> IteratorFixed<iter::Chain<I, IIF::IntoIter>, { N + M }>
     where
-        IIF: IntoIteratorFixed<I2, M>,
-        I2: Iterator<Item = <I as IntoIterator>::Item>,
+        IIF: IntoIteratorFixed<M, Item = I::Item>,
     {
         IteratorFixed {
             inner: self.inner.chain(other.into_iter_fixed().inner),
@@ -126,10 +125,9 @@ where
     }
 
     /// See [`core::iter::Iterator::zip`]
-    pub fn zip<U, IIF, I2>(self, other: IIF) -> IteratorFixed<iter::Zip<I, I2>, N>
+    pub fn zip<IIF>(self, other: IIF) -> IteratorFixed<iter::Zip<I, IIF::IntoIter>, N>
     where
-        IIF: IntoIteratorFixed<I2, N>,
-        I2: Iterator<Item = U>,
+        IIF: IntoIteratorFixed<N>,
     {
         IteratorFixed {
             inner: self.inner.zip(other.into_iter_fixed().inner),
