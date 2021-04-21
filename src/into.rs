@@ -15,7 +15,7 @@ pub unsafe trait IntoIteratorFixed<const N: usize> {
     /// The type of the elements being iterated over.
     type Item;
 
-    /// What will be the underlaying iterator for the IteratorFixed that we turning this into?
+    /// What will be the underlaying iterator for the IteratorFixed that we are turning this into?
     type IntoIter: Iterator<Item = Self::Item>;
 
     /// Creates a fixed size iterator from a value.
