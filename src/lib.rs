@@ -60,7 +60,7 @@ where
     pub fn map<U, F: FnMut(<I as Iterator>::Item) -> U>(
         self,
         p: F,
-    ) -> IteratorFixed<iter::Map<I, F>, N> {
+    ) -> IteratorFixed<impl Iterator<Item = U>, N> {
         IteratorFixed {
             inner: self.inner.map(p),
         }
@@ -70,7 +70,7 @@ where
     pub fn inspect<F: FnMut(&<I as Iterator>::Item)>(
         self,
         p: F,
-    ) -> IteratorFixed<iter::Inspect<I, F>, N> {
+    ) -> IteratorFixed<impl Iterator<Item = I::Item>, N> {
         IteratorFixed {
             inner: self.inner.inspect(p),
         }
@@ -79,7 +79,9 @@ where
     // TODO: what should happen when SKIP > N?
     /// See [`core::iter::Iterator::skip`]
     #[cfg(feature = "nightly_features")]
-    pub fn skip<const SKIP: usize>(self) -> IteratorFixed<iter::Skip<I>, { sub_or_zero(N, SKIP) }> {
+    pub fn skip<const SKIP: usize>(
+        self,
+    ) -> IteratorFixed<impl Iterator<Item = I::Item>, { sub_or_zero(N, SKIP) }> {
         IteratorFixed {
             inner: self.inner.skip(SKIP),
         }
@@ -89,7 +91,7 @@ where
     #[cfg(feature = "nightly_features")]
     pub fn step_by<const STEP: usize>(
         self,
-    ) -> IteratorFixed<iter::StepBy<I>, { ceiling_div(N, STEP) }> {
+    ) -> IteratorFixed<impl Iterator<Item = I::Item>, { ceiling_div(N, STEP) }> {
         IteratorFixed {
             inner: self.inner.step_by(STEP),
         }
@@ -100,7 +102,7 @@ where
     pub fn chain<IIF, const M: usize>(
         self,
         other: IIF,
-    ) -> IteratorFixed<iter::Chain<I, IIF::IntoIter>, { N + M }>
+    ) -> IteratorFixed<impl Iterator<Item = I::Item>, { N + M }>
     where
         IIF: IntoIteratorFixed<M, Item = I::Item>,
     {
@@ -110,7 +112,7 @@ where
     }
 
     /// See [`core::iter::Iterator::enumerate`]
-    pub fn enumerate(self) -> IteratorFixed<iter::Enumerate<I>, N> {
+    pub fn enumerate(self) -> IteratorFixed<impl Iterator<Item = (usize, I::Item)>, N> {
         IteratorFixed {
             inner: self.inner.enumerate(),
         }
@@ -118,14 +120,19 @@ where
 
     /// See [`core::iter::Iterator::take`]
     #[cfg(feature = "nightly_features")]
-    pub fn take<const TAKE: usize>(self) -> IteratorFixed<iter::Take<I>, { min(TAKE, N) }> {
+    pub fn take<const TAKE: usize>(
+        self,
+    ) -> IteratorFixed<impl Iterator<Item = I::Item>, { min(TAKE, N) }> {
         IteratorFixed {
             inner: self.inner.take(TAKE),
         }
     }
 
     /// See [`core::iter::Iterator::zip`]
-    pub fn zip<IIF>(self, other: IIF) -> IteratorFixed<iter::Zip<I, IIF::IntoIter>, N>
+    pub fn zip<IIF>(
+        self,
+        other: IIF,
+    ) -> IteratorFixed<impl Iterator<Item = (I::Item, IIF::Item)>, N>
     where
         IIF: IntoIteratorFixed<N>,
     {
@@ -146,7 +153,7 @@ where
     */
 
     /// See [`core::iter::Iterator::rev`]
-    pub fn rev(self) -> IteratorFixed<iter::Rev<I>, N>
+    pub fn rev(self) -> IteratorFixed<impl Iterator<Item = I::Item>, N>
     where
         I: iter::DoubleEndedIterator,
     {
@@ -209,7 +216,7 @@ where
     I: Iterator<Item = &'a T>,
 {
     /// See [`core::iter::Iterator::copied`]
-    pub fn copied(self) -> IteratorFixed<iter::Copied<I>, N>
+    pub fn copied(self) -> IteratorFixed<impl Iterator<Item = T>, N>
     where
         T: Copy,
     {
@@ -219,7 +226,7 @@ where
     }
 
     /// See [`core::iter::Iterator::cloned`]
-    pub fn cloned(self) -> IteratorFixed<iter::Cloned<I>, N>
+    pub fn cloned(self) -> IteratorFixed<impl Iterator<Item = T>, N>
     where
         T: Clone,
     {
