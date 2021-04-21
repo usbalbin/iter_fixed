@@ -3,6 +3,10 @@
 [![crates.io](https://img.shields.io/crates/v/iter_fixed.svg)](https://crates.io/crates/iter_fixed)
 [![docs.rs](https://docs.rs/iter_fixed/badge.svg)](https://docs.rs/iter_fixed/)
 
+![Stable](https://github.com/usbalbin/iter_fixed/actions/workflows/stable.yml/badge.svg)
+![Nightly](https://github.com/usbalbin/iter_fixed/actions/workflows/nightly.yml/badge.svg)
+![Miri](https://github.com/usbalbin/iter_fixed/actions/workflows/miri.yml/badge.svg)
+
 *This project is inspired by @leonardo-m 's idea https://github.com/rust-lang/rust/issues/80094#issuecomment-749260428*
 
 **This code is currently very experimental and by default requires a nightly compiler
