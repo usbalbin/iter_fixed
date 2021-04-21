@@ -1,7 +1,7 @@
 # iter_fixed
 
-![crates.io](https://img.shields.io/crates/v/iter_fixed.svg)
-![docs.rs](https://docs.rs/iter_fixed/badge.svg)
+[![crates.io](https://img.shields.io/crates/v/iter_fixed.svg)](https://crates.io/crates/iter_fixed)
+[![docs.rs](https://docs.rs/iter_fixed/badge.svg)](https://docs.rs/iter_fixed/)
 
 *This project is inspired by @leonardo-m 's idea https://github.com/rust-lang/rust/issues/80094#issuecomment-749260428*
 
