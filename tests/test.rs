@@ -55,7 +55,7 @@ fn test_changing_length() {
 
     assert_eq!(res, [1, 2]);
 
-    // TODO: Remove call to _.into_iter_fixed() once no longer needed
+    // TODO: Remove call to _.into_iter_fixed() [T; N] implements IntoIterator, see https://github.com/rust-lang/rust/pull/84147
     let res: [_; 4] = [[1, 2].into_iter_fixed(), [3, 4].into_iter_fixed()]
         .into_iter_fixed()
         .flatten()
@@ -63,7 +63,7 @@ fn test_changing_length() {
 
     assert_eq!(res, [1, 2, 3, 4]);
 
-    // TODO: Remove call to _.into_iter_fixed() once no longer needed
+    // TODO: Remove call to _.into_iter_fixed() [T; N] implements IntoIterator, see https://github.com/rust-lang/rust/pull/84147
     let res: [_; 6] = [1, 2, 3]
         .into_iter_fixed()
         .flat_map(|x| [x, x].into_iter_fixed())
