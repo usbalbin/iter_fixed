@@ -155,6 +155,31 @@ where
         }
     }
 
+    #[cfg(feature = "nightly_features")]
+    pub fn flatten<IIF, const M: usize>(self) -> IteratorFixed<iter::Flatten<I>, { M * N }>
+    where
+        I: Iterator<Item = IIF>,
+        IIF: IntoIteratorFixed<M> + IntoIterator,
+    {
+        IteratorFixed {
+            inner: self.inner.flatten(),
+        }
+    }
+
+    #[cfg(feature = "nightly_features")]
+    pub fn flat_map<F, IIF, const M: usize>(
+        self,
+        f: F,
+    ) -> IteratorFixed<iter::FlatMap<I, IIF, F>, { M * N }>
+    where
+        F: FnMut(I::Item) -> IIF,
+        IIF: IntoIteratorFixed<M> + IntoIterator,
+    {
+        IteratorFixed {
+            inner: self.inner.flat_map(f),
+        }
+    }
+
     /// Transforms a fixed size iterator into a collection of compile time known size.
     ///
     /// Basic usage:
@@ -194,29 +219,6 @@ where
             inner: self.inner.cloned(),
         }
     }
-}
-
-impl<I, IIF, const N: usize, const M: usize> IteratorFixed<I, N>
-where
-    I: Iterator<Item = IIF>,
-    IIF: IntoIteratorFixed<M> + IntoIterator,
-{
-    #[cfg(feature = "nightly_features")]
-    pub fn flatten(self) -> IteratorFixed<iter::Flatten<I>, { M * N }> {
-        IteratorFixed {
-            inner: self.inner.flatten(),
-        }
-    }
-
-    /*
-    pub fn flat_map(self, f: F) -> FlatMap<Self, U, F>
-    where
-        F: FnMut(Self::Item) -> U,
-        U: IntoIterator,
-    {
-        unimplemented!()
-    }
-    */
 }
 
 /// Convert the fixed size iterator into an ordinary [`core::iter::Iterator`]
