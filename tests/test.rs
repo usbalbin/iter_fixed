@@ -55,11 +55,18 @@ fn test_changing_length() {
 
     assert_eq!(res, [1, 2]);
 
-    // Remove call to _.into_iter_fixed() once no longer needed
-    let res: [_; 4] = [[1, 2].into_iter_fixed(), [3, 4].into_iter_fixed()]
-        .into_iter_fixed()
-        .flatten()
-        .collect();
+    let res: [_; 4] = [[1, 2], [3, 4]].into_iter_fixed().flatten().collect();
 
     assert_eq!(res, [1, 2, 3, 4]);
+
+    let res: [_; 6] = [1, 2, 3].into_iter_fixed().flat_map(|x| [x, x]).collect();
+
+    assert_eq!(res, [1, 1, 2, 2, 3, 3]);
+
+    let res: [_; 6] = [1, 2, 3]
+        .into_iter_fixed()
+        .flat_map(|x| IntoIteratorFixed::<2>::into_iter_fixed(core::iter::repeat(x)))
+        .collect();
+
+    assert_eq!(res, [1, 1, 2, 2, 3, 3]);
 }

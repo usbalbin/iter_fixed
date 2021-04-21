@@ -60,7 +60,7 @@ where
     pub fn map<U, F: FnMut(<I as Iterator>::Item) -> U>(
         self,
         p: F,
-    ) -> IteratorFixed<iter::Map<I, F>, N> {
+    ) -> IteratorFixed<impl Iterator<Item = U>, N> {
         IteratorFixed {
             inner: self.inner.map(p),
         }
@@ -70,7 +70,7 @@ where
     pub fn inspect<F: FnMut(&<I as Iterator>::Item)>(
         self,
         p: F,
-    ) -> IteratorFixed<iter::Inspect<I, F>, N> {
+    ) -> IteratorFixed<impl Iterator<Item = I::Item>, N> {
         IteratorFixed {
             inner: self.inner.inspect(p),
         }
@@ -79,7 +79,9 @@ where
     // TODO: what should happen when SKIP > N?
     /// See [`core::iter::Iterator::skip`]
     #[cfg(feature = "nightly_features")]
-    pub fn skip<const SKIP: usize>(self) -> IteratorFixed<iter::Skip<I>, { sub_or_zero(N, SKIP) }> {
+    pub fn skip<const SKIP: usize>(
+        self,
+    ) -> IteratorFixed<impl Iterator<Item = I::Item>, { sub_or_zero(N, SKIP) }> {
         IteratorFixed {
             inner: self.inner.skip(SKIP),
         }
@@ -89,7 +91,7 @@ where
     #[cfg(feature = "nightly_features")]
     pub fn step_by<const STEP: usize>(
         self,
-    ) -> IteratorFixed<iter::StepBy<I>, { ceiling_div(N, STEP) }> {
+    ) -> IteratorFixed<impl Iterator<Item = I::Item>, { ceiling_div(N, STEP) }> {
         IteratorFixed {
             inner: self.inner.step_by(STEP),
         }
@@ -97,13 +99,12 @@ where
 
     /// See [`core::iter::Iterator::chain`]
     #[cfg(feature = "nightly_features")]
-    pub fn chain<IIF, I2, const M: usize>(
+    pub fn chain<IIF, const M: usize>(
         self,
         other: IIF,
-    ) -> IteratorFixed<iter::Chain<I, I2>, { N + M }>
+    ) -> IteratorFixed<impl Iterator<Item = I::Item>, { N + M }>
     where
-        IIF: IntoIteratorFixed<I2, M>,
-        I2: Iterator<Item = <I as IntoIterator>::Item>,
+        IIF: IntoIteratorFixed<M, Item = I::Item>,
     {
         IteratorFixed {
             inner: self.inner.chain(other.into_iter_fixed().inner),
@@ -111,7 +112,7 @@ where
     }
 
     /// See [`core::iter::Iterator::enumerate`]
-    pub fn enumerate(self) -> IteratorFixed<iter::Enumerate<I>, N> {
+    pub fn enumerate(self) -> IteratorFixed<impl Iterator<Item = (usize, I::Item)>, N> {
         IteratorFixed {
             inner: self.inner.enumerate(),
         }
@@ -119,17 +120,21 @@ where
 
     /// See [`core::iter::Iterator::take`]
     #[cfg(feature = "nightly_features")]
-    pub fn take<const TAKE: usize>(self) -> IteratorFixed<iter::Take<I>, { min(TAKE, N) }> {
+    pub fn take<const TAKE: usize>(
+        self,
+    ) -> IteratorFixed<impl Iterator<Item = I::Item>, { min(TAKE, N) }> {
         IteratorFixed {
             inner: self.inner.take(TAKE),
         }
     }
 
     /// See [`core::iter::Iterator::zip`]
-    pub fn zip<U, IIF, I2>(self, other: IIF) -> IteratorFixed<iter::Zip<I, I2>, N>
+    pub fn zip<IIF>(
+        self,
+        other: IIF,
+    ) -> IteratorFixed<impl Iterator<Item = (I::Item, IIF::Item)>, N>
     where
-        IIF: IntoIteratorFixed<I2, N>,
-        I2: Iterator<Item = U>,
+        IIF: IntoIteratorFixed<N>,
     {
         IteratorFixed {
             inner: self.inner.zip(other.into_iter_fixed().inner),
@@ -148,12 +153,45 @@ where
     */
 
     /// See [`core::iter::Iterator::rev`]
-    pub fn rev(self) -> IteratorFixed<iter::Rev<I>, N>
+    pub fn rev(self) -> IteratorFixed<impl Iterator<Item = I::Item>, N>
     where
         I: iter::DoubleEndedIterator,
     {
         IteratorFixed {
             inner: self.inner.rev(),
+        }
+    }
+
+    #[cfg(feature = "nightly_features")]
+    pub fn flatten<IIF, const M: usize>(
+        self,
+    ) -> IteratorFixed<impl Iterator<Item = IIF::Item>, { M * N }>
+    where
+        I: Iterator<Item = IIF>,
+        IIF: IntoIteratorFixed<M>,
+    {
+        // The call to into_iter_fixed is needed because we cannot trust that
+        // let x: I::Item;
+        // x.into_iterator() == x.into_iter_fixed().into_iterator()
+        IteratorFixed {
+            inner: self.inner.flat_map(IntoIteratorFixed::into_iter_fixed),
+        }
+    }
+
+    #[cfg(feature = "nightly_features")]
+    pub fn flat_map<F, IIF, const M: usize>(
+        self,
+        mut f: F,
+    ) -> IteratorFixed<impl Iterator<Item = IIF::Item>, { M * N }>
+    where
+        F: FnMut(I::Item) -> IIF,
+        IIF: IntoIteratorFixed<M>,
+    {
+        // The call to into_iter_fixed is needed because we cannot trust that
+        // let x: I::Item;
+        // x.into_iterator() == x.into_iter_fixed().into_iterator()
+        IteratorFixed {
+            inner: self.inner.flat_map(move |x| f(x).into_iter_fixed()),
         }
     }
 
@@ -178,7 +216,7 @@ where
     I: Iterator<Item = &'a T>,
 {
     /// See [`core::iter::Iterator::copied`]
-    pub fn copied(self) -> IteratorFixed<iter::Copied<I>, N>
+    pub fn copied(self) -> IteratorFixed<impl Iterator<Item = T>, N>
     where
         T: Copy,
     {
@@ -188,7 +226,7 @@ where
     }
 
     /// See [`core::iter::Iterator::cloned`]
-    pub fn cloned(self) -> IteratorFixed<iter::Cloned<I>, N>
+    pub fn cloned(self) -> IteratorFixed<impl Iterator<Item = T>, N>
     where
         T: Clone,
     {
@@ -196,31 +234,6 @@ where
             inner: self.inner.cloned(),
         }
     }
-}
-
-impl<I, I2, const N: usize, const M: usize> IteratorFixed<I, N>
-where
-    I: Iterator<Item = IteratorFixed<I2, M>>,
-    I2: Iterator,
-{
-    // TODO: Would it be better to have `I: Iterator<Item = IntoIteratorFixed`?
-    /// See [`core::iter::Iterator::flatten`]
-    #[cfg(feature = "nightly_features")]
-    pub fn flatten(self) -> IteratorFixed<iter::Flatten<I>, { M * N }> {
-        IteratorFixed {
-            inner: self.inner.flatten(),
-        }
-    }
-
-    /*
-    pub fn flat_map(self, f: F) -> FlatMap<Self, U, F>
-    where
-        F: FnMut(Self::Item) -> U,
-        U: IntoIterator,
-    {
-        unimplemented!()
-    }
-    */
 }
 
 /// Convert the fixed size iterator into an ordinary [`core::iter::Iterator`]
