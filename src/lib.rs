@@ -156,27 +156,35 @@ where
     }
 
     #[cfg(feature = "nightly_features")]
-    pub fn flatten<IIF, const M: usize>(self) -> IteratorFixed<iter::Flatten<I>, { M * N }>
+    pub fn flatten<IIF, const M: usize>(
+        self,
+    ) -> IteratorFixed<impl Iterator<Item = IIF::Item>, { M * N }>
     where
         I: Iterator<Item = IIF>,
-        IIF: IntoIteratorFixed<M> + IntoIterator,
+        IIF: IntoIteratorFixed<M>,
     {
+        // The call to into_iter_fixed is needed because we cannot trust that
+        // let x: I::Item;
+        // x.into_iterator() == x.into_iter_fixed().into_iterator()
         IteratorFixed {
-            inner: self.inner.flatten(),
+            inner: self.inner.flat_map(IntoIteratorFixed::into_iter_fixed),
         }
     }
 
     #[cfg(feature = "nightly_features")]
     pub fn flat_map<F, IIF, const M: usize>(
         self,
-        f: F,
-    ) -> IteratorFixed<iter::FlatMap<I, IIF, F>, { M * N }>
+        mut f: F,
+    ) -> IteratorFixed<impl Iterator<Item = IIF::Item>, { M * N }>
     where
         F: FnMut(I::Item) -> IIF,
-        IIF: IntoIteratorFixed<M> + IntoIterator,
+        IIF: IntoIteratorFixed<M>,
     {
+        // The call to into_iter_fixed is needed because we cannot trust that
+        // let x: I::Item;
+        // x.into_iterator() == x.into_iter_fixed().into_iterator()
         IteratorFixed {
-            inner: self.inner.flat_map(f),
+            inner: self.inner.flat_map(move |x| f(x).into_iter_fixed()),
         }
     }
 
