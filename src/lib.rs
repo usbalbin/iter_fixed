@@ -23,7 +23,7 @@ pub use into::IntoIteratorFixed;
 /// length. This enables us to turn them back into collections of fixed size without having to
 /// perform unnecessary checks during run time.
 ///
-/// Just like Iterator, IteratorFixed provides a lot of methods like:
+/// Just like `Iterator`, `IteratorFixed` provides a lot of methods like:
 ///
 /// * `map`
 /// * `inspect`
@@ -47,7 +47,7 @@ where
     I: Iterator,
 {
     /// # Safety
-    /// Caller has to guarantee that the given iterator will yield exactly N elements
+    /// Caller has to guarantee that the given iterator will yield exactly `N` elements
     ///
     // TODO: Would it be ok if it generated more elements?
     pub unsafe fn from_iter<II: IntoIterator<IntoIter = I>>(i: II) -> Self {
