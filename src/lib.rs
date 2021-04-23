@@ -141,16 +141,22 @@ where
         }
     }
 
-    /*
-    pub fn unzip<A, B, FromA, FromB>(self) -> (FromA, FromB)
+    /// See [`core::iter::Iterator::unzip`]
+    pub fn unzip<IA, IB, FromA, FromB>(self) -> (FromA, FromB)
     where
-        I: Iterator<Item = (A, B)>,
-        FromA: FromIteratorFixed<A, N>,
-        FromB: FromIteratorFixed<B, N>,
+        I: Iterator<Item = (IA::Item, IB::Item)>,
+        IA: Iterator + Default + Extend<IA::Item>,
+        IB: Iterator + Default + Extend<IB::Item>,
+        FromA: FromIteratorFixed<IA, N>,
+        FromB: FromIteratorFixed<IB, N>,
     {
-        unimplemented!()
+        let (a, b) = self.inner.unzip();
+
+        (
+            IteratorFixed { inner: a }.collect(),
+            IteratorFixed { inner: b }.collect(),
+        )
     }
-    */
 
     /// See [`core::iter::Iterator::rev`]
     pub fn rev(self) -> IteratorFixed<impl Iterator<Item = I::Item>, N>
