@@ -48,8 +48,6 @@ where
 {
     /// # Safety
     /// Caller has to guarantee that the given iterator will yield exactly `N` elements
-    ///
-    // TODO: Would it be ok if it generated more elements?
     pub unsafe fn from_iter<II: IntoIterator<IntoIter = I>>(i: II) -> Self {
         IteratorFixed {
             inner: i.into_iter(),
