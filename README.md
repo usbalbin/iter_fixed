@@ -2,6 +2,7 @@
 
 [![crates.io](https://img.shields.io/crates/v/iter_fixed.svg)](https://crates.io/crates/iter_fixed)
 [![docs.rs](https://docs.rs/iter_fixed/badge.svg)](https://docs.rs/iter_fixed/)
+[![dependency status](https://deps.rs/crate/iter_fixed/0.2.0/status.svg)](https://deps.rs/crate/iter_fixed/0.2.0)
 
 ![Stable](https://github.com/usbalbin/iter_fixed/actions/workflows/stable.yml/badge.svg)
 ![Nightly](https://github.com/usbalbin/iter_fixed/actions/workflows/nightly.yml/badge.svg)
