@@ -23,23 +23,23 @@ with a compile time guaranteed length. This enables us to turn them back into
 collections of fixed size without having to perform unnecessary checks during
 run time.
 
-Just like `Iterator`, `IteratorFixed` provides methods like:
+Just like [`Iterator`](https://doc.rust-lang.org/std/iter/trait.Iterator.html), [`IteratorFixed`](https://docs.rs/iter_fixed/latest/iter_fixed/struct.IteratorFixed.html) provides methods like:
 
 ###### Works on stable rust
-* `map`
-* `inspect`
-* `enumerate`
-* `zip`
-* `rev`
-* `copied`
-* `cloned`
+* [`map`](https://docs.rs/iter_fixed/latest/iter_fixed/struct.IteratorFixed.html#method.map)
+* [`inspect`](https://docs.rs/iter_fixed/latest/iter_fixed/struct.IteratorFixed.html#method.inspect)
+* [`enumerate`](https://docs.rs/iter_fixed/latest/iter_fixed/struct.IteratorFixed.html#method.enumerate)
+* [`zip`](https://docs.rs/iter_fixed/latest/iter_fixed/struct.IteratorFixed.html#method.zip)
+* [`rev`](https://docs.rs/iter_fixed/latest/iter_fixed/struct.IteratorFixed.html#method.rev)
+* [`copied`](https://docs.rs/iter_fixed/latest/iter_fixed/struct.IteratorFixed.html#method.copied)
+* [`cloned`](https://docs.rs/iter_fixed/latest/iter_fixed/struct.IteratorFixed.html#method.cloned)
 
 ###### Requires nightly compiler
-* `skip`
-* `step_by`
-* `chain`
-* `take`
-* `flatten`
+* [`skip`](https://docs.rs/iter_fixed/latest/iter_fixed/struct.IteratorFixed.html#method.skip)
+* [`step_by`](https://docs.rs/iter_fixed/latest/iter_fixed/struct.IteratorFixed.html#method.step_by)
+* [`chain`](https://docs.rs/iter_fixed/latest/iter_fixed/struct.IteratorFixed.html#method.chain)
+* [`take`](https://docs.rs/iter_fixed/latest/iter_fixed/struct.IteratorFixed.html#method.take)
+* [`flatten`](https://docs.rs/iter_fixed/latest/iter_fixed/struct.IteratorFixed.html#method.flatten)
 
 however it does not and will never be able to support methods like `filter` or `take_while` which will affect the length during runtime.
 
