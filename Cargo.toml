@@ -6,6 +6,8 @@ edition = "2018"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/usbalbin/iter_fixed/"
 description = "Iterator of fixed length"
+keywords = ["iterator", "array", "data-structure", "zip"]
+categories = ["rust-patterns", "no-std"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
