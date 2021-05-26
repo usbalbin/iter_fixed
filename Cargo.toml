@@ -1,6 +1,6 @@
 [package]
 name = "iter_fixed"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["Albin Hedman <albin9604@gmail.com>"]
 edition = "2018"
 license = "MIT OR Apache-2.0"
