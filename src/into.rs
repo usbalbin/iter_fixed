@@ -109,6 +109,8 @@ unsafe impl<'a, T, const N: usize> IntoIteratorFixed<N> for &'a mut [T; N] {
     /// ```
     /// use iter_fixed::IntoIteratorFixed;
     ///
+    /// // Update `array` in place to element wise x * 2
+    /// // return the initial value of the array
     /// fn double<const N: usize>(array: &mut [i32; N]) -> [i32; N] {
     ///     let fixed_iter = array.into_iter_fixed().map(|x| {
     ///         let old = *x;
