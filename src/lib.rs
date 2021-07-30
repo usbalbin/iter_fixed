@@ -47,6 +47,34 @@ impl<I, const N: usize> IteratorFixed<I, N>
 where
     I: Iterator,
 {
+    /// Creates a new iterator of fixed size where each iteration calls the provided closure F: FnMut(usize) -> T
+    ///
+    /// This allows very simple initialization of types that implement `FromIteratorFixed` such as arrays.
+    ///
+    /// Note: This function is quite similar to [`iter::from_fn`] however note that in contrast to `iter::from_fn`, 
+    /// in `IteratorFixed::from_fn` the provided function does not have any say in the number of elements.
+    /// The length is entirely determined by `N`.
+    ///
+    /// Basic usage:
+    /// ```
+    /// use iter_fixed::IteratorFixed;
+    ///
+    /// let zero_two_four: [i32; 3] = IteratorFixed::from_fn(|i| 2 * i).collect();
+    ///
+    /// assert_eq!(a, [0, 2, 4]);
+    /// ```
+    pub fn from_fn<'a, F, T: 'a>(
+        mut f: F,
+    ) -> IteratorFixed<impl Iterator<Item = T> + 'a, N>
+    where
+        F: FnMut(usize) -> T + 'a,
+    {
+        [(); N]
+            .into_iter_fixed()
+            .enumerate()
+            .map(move |(i, _)| f(i))
+    }
+
     /// # Safety
     /// Caller has to guarantee that the given iterator will yield exactly N elements
     ///
