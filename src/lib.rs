@@ -1,4 +1,5 @@
 #![no_std]
+#![allow(stable_features)]
 #![cfg_attr(feature = "nightly_features", allow(incomplete_features))]
 #![cfg_attr(
     feature = "nightly_features",
