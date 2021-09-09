@@ -1,4 +1,5 @@
 #![no_std]
+#![allow(stable_features)]
 #![cfg_attr(feature = "nightly_features", allow(incomplete_features))]
 #![cfg_attr(
     feature = "nightly_features",
@@ -40,6 +41,32 @@ pub use into::IntoIteratorFixed;
 /// however it does not support methods like `filter` or `take_while` which will affect the length during runtime.
 pub struct IteratorFixed<I: Iterator, const N: usize> {
     inner: I,
+}
+
+/// Creates a new iterator of fixed size where each iteration calls the provided closure F: FnMut(usize) -> T
+///
+/// This allows very simple initialization of types that implement `FromIteratorFixed` such as arrays.
+///
+/// Note: This function is quite similar to [`iter::from_fn`] however note that in contrast to `iter::from_fn`,
+/// in `IteratorFixed::from_fn` the provided function does not have any say in the number of elements.
+/// The length is entirely determined by `N`.
+///
+/// Basic usage:
+/// ```
+/// let zero_two_four: [usize; 3] = iter_fixed::from_fn(|i| 2 * i).collect();
+///
+/// assert_eq!(zero_two_four, [0, 2, 4]);
+/// ```
+pub fn from_fn<'a, F, T: 'a, const N: usize>(
+    mut f: F,
+) -> IteratorFixed<impl Iterator<Item = T> + 'a, N>
+where
+    F: FnMut(usize) -> T + 'a,
+{
+    [(); N]
+        .into_iter_fixed()
+        .enumerate()
+        .map(move |(i, _)| f(i))
 }
 
 impl<I, const N: usize> IteratorFixed<I, N>

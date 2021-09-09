@@ -86,15 +86,46 @@ unsafe impl<'a, T, const N: usize> IntoIteratorFixed<N> for &'a [T; N] {
     /// Basic usage:
     /// ```
     /// use iter_fixed::IntoIteratorFixed;
+    /// fn double<const N: usize>(array: &[i32; N]) -> [i32; N] {
+    ///     let two_four_six = array.into_iter_fixed().map(|&x| 2 * x);
     ///
-    /// let two_four_six = [1, 2, 3].into_iter_fixed().map(|x| 2 * x);
-    ///
-    /// let a: [i32; 3] = two_four_six.collect();
-    /// assert_eq!(a, [2, 4, 6]);
+    ///     two_four_six.collect()
+    /// }
+    /// assert_eq!(double(&[1, 2, 3]), [2, 4, 6]);
     /// ```
     fn into_iter_fixed(self) -> IteratorFixed<Self::IntoIter, N> {
         // Safety: [T; N]::iter always yields N elements
         unsafe { IteratorFixed::from_iter(self.iter()) }
+    }
+}
+
+unsafe impl<'a, T, const N: usize> IntoIteratorFixed<N> for &'a mut [T; N] {
+    type Item = &'a mut T;
+    type IntoIter = slice::IterMut<'a, T>;
+
+    /// Creates a fixed size iterator from a mutably borrowed array.
+    ///
+    /// Basic usage:
+    /// ```
+    /// use iter_fixed::IntoIteratorFixed;
+    ///
+    /// // Update `array` in place to element wise x * 2
+    /// // return the initial value of the array
+    /// fn double<const N: usize>(array: &mut [i32; N]) -> [i32; N] {
+    ///     let fixed_iter = array.into_iter_fixed().map(|x| {
+    ///         let old = *x;
+    ///         *x = 2 * *x;
+    ///         old
+    ///     });
+    ///     fixed_iter.collect()
+    /// }
+    /// let mut a = [1, 2, 3];
+    /// assert_eq!(double(&mut a), [1, 2, 3]);
+    /// assert_eq!(a, [2, 4, 6]);
+    /// ```
+    fn into_iter_fixed(self) -> IteratorFixed<Self::IntoIter, N> {
+        // Safety: [T; N]::iter always yields N elements
+        unsafe { IteratorFixed::from_iter(self.iter_mut()) }
     }
 }
 
