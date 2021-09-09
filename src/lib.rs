@@ -3,7 +3,7 @@
 #![cfg_attr(feature = "nightly_features", allow(incomplete_features))]
 #![cfg_attr(
     feature = "nightly_features",
-    feature(array_map, const_generics, const_evaluatable_checked)
+    feature(const_generics, const_evaluatable_checked)
 )]
 
 use core::iter;

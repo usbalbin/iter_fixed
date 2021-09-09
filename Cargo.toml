@@ -1,6 +1,6 @@
 [package]
 name = "iter_fixed"
-version = "0.2.2"
+version = "0.3.0"
 authors = ["Albin Hedman <albin9604@gmail.com>"]
 edition = "2018"
 license = "MIT OR Apache-2.0"
@@ -12,7 +12,7 @@ categories = ["rust-patterns", "no-std"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [features]
-default = ["nightly_features"]
+default = []
 nightly_features = []
 
 [dependencies]

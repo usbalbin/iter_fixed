@@ -2,7 +2,7 @@
 
 [![crates.io](https://img.shields.io/crates/v/iter_fixed.svg)](https://crates.io/crates/iter_fixed)
 [![docs.rs](https://docs.rs/iter_fixed/badge.svg)](https://docs.rs/iter_fixed/)
-[![dependency status](https://deps.rs/crate/iter_fixed/0.2.2/status.svg)](https://deps.rs/crate/iter_fixed/0.2.2)
+[![dependency status](https://deps.rs/crate/iter_fixed/0.3.0/status.svg)](https://deps.rs/crate/iter_fixed/0.3.0)
 
 ![Stable](https://github.com/usbalbin/iter_fixed/actions/workflows/stable.yml/badge.svg)
 ![Nightly](https://github.com/usbalbin/iter_fixed/actions/workflows/nightly.yml/badge.svg)
@@ -10,12 +10,7 @@
 
 *This project is inspired by @leonardo-m 's idea https://github.com/rust-lang/rust/issues/80094#issuecomment-749260428*
 
-**This code is currently very experimental and by default requires a nightly compiler
-in order to work with *the least amount of unsafe code**. Type names, function names,
-trait bounds etc. are all very much subject to change. 
-
-**Please be aware that the `impl FromIteratorFixed for [T; N]` in particular contains lots of
-unsafe code when compiled by a stable compiler without `nightly_features`*
+**This code is currently very experimental, type names, function names, trait bounds etc. are all very much subject to change. 
 
 Provides a type and traits for turning collections of fixed size, like arrays,
 into `IteratorFixed` which can be used a bit like an ordinary `Iterator` but
