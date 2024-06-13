@@ -73,7 +73,7 @@ unsafe impl<T, const N: usize> IntoIteratorFixed<N> for [T; N] {
     /// ```
     fn into_iter_fixed(self) -> IteratorFixed<array::IntoIter<T, N>, N> {
         // Safety: array::IntoIter::new([T; N]) always yields N elements
-        unsafe { IteratorFixed::from_iter(array::IntoIter::new(self)) }
+        unsafe { IteratorFixed::from_iter(<[T; N] as IntoIterator>::into_iter(self)) }
     }
 }
 
