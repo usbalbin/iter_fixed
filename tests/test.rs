@@ -1,5 +1,5 @@
 #![cfg_attr(feature = "nightly_features", allow(incomplete_features))]
-#![cfg_attr(feature = "nightly_features", feature(const_generics))]
+#![cfg_attr(feature = "nightly_features", feature(generic_const_exprs))]
 
 extern crate iter_fixed;
 
@@ -15,11 +15,11 @@ fn test() {
 
     assert_eq!(res, [5, 5, 5, 5]);
 
-    let foo: [(_, _); 3] = [1, 2, 3]
+    let res: [(_, _); 3] = [1, 2, 3]
         .into_iter_fixed()
         .zip(core::iter::repeat(42))
         .collect();
-    assert_eq!(foo, [(1, 42), (2, 42), (3, 42)]);
+    assert_eq!(res, [(1, 42), (2, 42), (3, 42)]);
 }
 
 #[cfg(feature = "nightly_features")]
