@@ -1,10 +1,7 @@
 #![no_std]
 #![allow(stable_features)]
 #![cfg_attr(feature = "nightly_features", allow(incomplete_features))]
-#![cfg_attr(
-    feature = "nightly_features",
-    feature(const_generics, const_evaluatable_checked)
-)]
+#![cfg_attr(feature = "nightly_features", feature(generic_const_exprs))]
 
 use core::iter;
 
