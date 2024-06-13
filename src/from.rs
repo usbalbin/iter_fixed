@@ -10,7 +10,7 @@ use crate::IteratorFixed;
 /// documentation for more examples.
 ///
 /// See also: [`crate::IntoIteratorFixed`].
-pub trait FromIteratorFixed<I: Iterator, const N: usize> {
+pub trait FromIteratorFixed<T, const N: usize> {
     /// Creates a value from a fixed size iterator.
     ///
     /// Basic usage:
@@ -32,10 +32,10 @@ pub trait FromIteratorFixed<I: Iterator, const N: usize> {
     /// let a: [i32; 3] = two_four_six.collect();
     /// assert_eq!(a, [2, 4, 6]);
     /// ```
-    fn from_iter_fixed(iter_fixed: IteratorFixed<I, N>) -> Self;
+    fn from_iter_fixed<I: Iterator<Item = T>>(iter_fixed: IteratorFixed<I, N>) -> Self;
 }
 
-impl<I: Iterator, const N: usize> FromIteratorFixed<I, N> for [<I as Iterator>::Item; N] {
+impl<T, const N: usize> FromIteratorFixed<T, N> for [T; N] {
     /// Creates an array from a fixed size iterator.
     ///
     /// Basic usage:
@@ -57,7 +57,7 @@ impl<I: Iterator, const N: usize> FromIteratorFixed<I, N> for [<I as Iterator>::
     /// let a: [i32; 3] = two_four_six.collect();
     /// assert_eq!(a, [2, 4, 6]);
     /// ```
-    fn from_iter_fixed(iter_fixed: IteratorFixed<I, N>) -> Self {
+    fn from_iter_fixed<I: Iterator<Item = T>>(iter_fixed: IteratorFixed<I, N>) -> Self {
         let IteratorFixed { inner: mut it } = iter_fixed;
         // We know that it will yield N elements due to it originating from an IteratorFixed
         // of size N

@@ -233,7 +233,7 @@ where
     /// let a: [i32; 3] = two_four_six.collect();
     /// assert_eq!(a, [2, 4, 6]);
     /// ```
-    pub fn collect<U: FromIteratorFixed<I, N>>(self) -> U {
+    pub fn collect<U: FromIteratorFixed<I::Item, N>>(self) -> U {
         U::from_iter_fixed(self)
     }
 }
