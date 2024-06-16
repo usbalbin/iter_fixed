@@ -53,7 +53,7 @@ You can also take a look at examples : [`matrix.rs`] and [`vector.rs`]
 [`vector.rs`]: source/examples/vector.rs
 
 
-Current version: 0.3.1
+Current version: 0.4.0
 
 ## no_std
 
