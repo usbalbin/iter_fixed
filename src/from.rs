@@ -23,7 +23,7 @@ pub trait FromIteratorFixed<T, const N: usize> {
     /// assert_eq!(a, [2, 4, 6]);
     /// ```
     ///
-    /// Using IteratorFixed::collect() to implicitly use FromIteratorFixed:
+    /// Using `IteratorFixed::collect()` to implicitly use `FromIteratorFixed`:
     /// ```
     /// use iter_fixed::IntoIteratorFixed;
     ///
@@ -48,7 +48,7 @@ impl<T, const N: usize> FromIteratorFixed<T, N> for [T; N] {
     /// assert_eq!(a, [2, 4, 6]);
     /// ```
     ///
-    /// Using IteratorFixed::collect() to implicitly use FromIteratorFixed:
+    /// Using `IteratorFixed::collect()` to implicitly use `FromIteratorFixed`:
     /// ```
     /// use iter_fixed::IntoIteratorFixed;
     ///
