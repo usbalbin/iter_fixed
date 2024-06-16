@@ -61,6 +61,6 @@ impl<T, const N: usize> FromIteratorFixed<T, N> for [T; N] {
         let IteratorFixed { inner: mut it } = iter_fixed;
         // We know that it will yield N elements due to it originating from an IteratorFixed
         // of size N
-        [(); N].map(|_| it.next().unwrap())
+        [(); N].map(|()| it.next().unwrap())
     }
 }
