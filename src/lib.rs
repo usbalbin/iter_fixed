@@ -5,6 +5,7 @@
 // enable additionnal lints
 #![warn(clippy::doc_markdown)]
 #![warn(clippy::ignored_unit_patterns)]
+#![warn(clippy::missing_inline_in_public_items)]
 #![warn(clippy::use_self)]
 
 use core::iter;
@@ -58,6 +59,7 @@ pub struct IteratorFixed<I: Iterator, const N: usize> {
 ///
 /// assert_eq!(zero_two_four, [0, 2, 4]);
 /// ```
+#[inline]
 pub fn from_fn<'a, F, T: 'a, const N: usize>(
     mut f: F,
 ) -> IteratorFixed<impl Iterator<Item = T> + 'a, N>
@@ -78,6 +80,7 @@ where
     /// Caller has to guarantee that the given iterator will yield exactly N elements
     ///
     // TODO: Would it be ok if it generated more elements?
+    #[inline]
     pub unsafe fn from_iter<II: IntoIterator<IntoIter = I>>(i: II) -> Self {
         Self {
             inner: i.into_iter(),
@@ -85,6 +88,7 @@ where
     }
 
     /// See [`core::iter::Iterator::map`]
+    #[inline]
     pub fn map<U, F: FnMut(<I as Iterator>::Item) -> U>(
         self,
         p: F,
@@ -95,6 +99,7 @@ where
     }
 
     /// See [`core::iter::Iterator::inspect`]
+    #[inline]
     pub fn inspect<F: FnMut(&<I as Iterator>::Item)>(
         self,
         p: F,
@@ -107,6 +112,7 @@ where
     // TODO: what should happen when SKIP > N?
     /// See [`core::iter::Iterator::skip`]
     #[cfg(feature = "nightly_features")]
+    #[inline]
     pub fn skip<const SKIP: usize>(
         self,
     ) -> IteratorFixed<impl Iterator<Item = I::Item>, { sub_or_zero(N, SKIP) }> {
@@ -117,6 +123,7 @@ where
 
     /// See [`core::iter::Iterator::step_by`]
     #[cfg(feature = "nightly_features")]
+    #[inline]
     pub fn step_by<const STEP: usize>(
         self,
     ) -> IteratorFixed<impl Iterator<Item = I::Item>, { ceiling_div(N, STEP) }> {
@@ -127,6 +134,7 @@ where
 
     /// See [`core::iter::Iterator::chain`]
     #[cfg(feature = "nightly_features")]
+    #[inline]
     pub fn chain<IIF, const M: usize>(
         self,
         other: IIF,
@@ -140,6 +148,7 @@ where
     }
 
     /// See [`core::iter::Iterator::enumerate`]
+    #[inline]
     pub fn enumerate(self) -> IteratorFixed<impl Iterator<Item = (usize, I::Item)>, N> {
         IteratorFixed {
             inner: self.inner.enumerate(),
@@ -148,6 +157,7 @@ where
 
     /// See [`core::iter::Iterator::take`]
     #[cfg(feature = "nightly_features")]
+    #[inline]
     pub fn take<const TAKE: usize>(
         self,
     ) -> IteratorFixed<impl Iterator<Item = I::Item>, { min(TAKE, N) }> {
@@ -157,6 +167,7 @@ where
     }
 
     /// See [`core::iter::Iterator::zip`]
+    #[inline]
     pub fn zip<IIF>(
         self,
         other: IIF,
@@ -181,6 +192,7 @@ where
     */
 
     /// See [`core::iter::Iterator::rev`]
+    #[inline]
     pub fn rev(self) -> IteratorFixed<impl Iterator<Item = I::Item>, N>
     where
         I: iter::DoubleEndedIterator,
@@ -191,6 +203,7 @@ where
     }
 
     #[cfg(feature = "nightly_features")]
+    #[inline]
     pub fn flatten<IIF, const M: usize>(
         self,
     ) -> IteratorFixed<impl Iterator<Item = IIF::Item>, { M * N }>
@@ -207,6 +220,7 @@ where
     }
 
     #[cfg(feature = "nightly_features")]
+    #[inline]
     pub fn flat_map<F, IIF, const M: usize>(
         self,
         mut f: F,
@@ -234,6 +248,7 @@ where
     /// let a: [i32; 3] = two_four_six.collect();
     /// assert_eq!(a, [2, 4, 6]);
     /// ```
+    #[inline]
     pub fn collect<U: FromIteratorFixed<I::Item, N>>(self) -> U {
         U::from_iter_fixed(self)
     }
@@ -244,6 +259,7 @@ where
     I: Iterator<Item = &'a T>,
 {
     /// See [`core::iter::Iterator::copied`]
+    #[inline]
     pub fn copied(self) -> IteratorFixed<impl Iterator<Item = T>, N>
     where
         T: Copy,
@@ -254,6 +270,7 @@ where
     }
 
     /// See [`core::iter::Iterator::cloned`]
+    #[inline]
     pub fn cloned(self) -> IteratorFixed<impl Iterator<Item = T>, N>
     where
         T: Clone,
@@ -271,6 +288,7 @@ impl<T, I: Iterator<Item = T>, const N: usize> IntoIterator for IteratorFixed<I,
     type IntoIter = I;
 
     /// Convert the fixed size iterator into an ordinary [`core::iter::Iterator`]
+    #[inline]
     fn into_iter(self) -> I {
         self.inner
     }
