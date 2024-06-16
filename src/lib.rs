@@ -4,6 +4,7 @@
 #![cfg_attr(feature = "nightly_features", feature(generic_const_exprs))]
 // enable additionnal lints
 #![warn(clippy::doc_markdown)]
+#![warn(clippy::ignored_unit_patterns)]
 
 use core::iter;
 
@@ -65,7 +66,7 @@ where
     [(); N]
         .into_iter_fixed()
         .enumerate()
-        .map(move |(i, _)| f(i))
+        .map(move |(i, ())| f(i))
 }
 
 impl<I, const N: usize> IteratorFixed<I, N>
