@@ -2,6 +2,8 @@
 #![allow(stable_features)]
 #![cfg_attr(feature = "nightly_features", allow(incomplete_features))]
 #![cfg_attr(feature = "nightly_features", feature(generic_const_exprs))]
+// enable additionnal lints
+#![warn(clippy::doc_markdown)]
 
 use core::iter;
 
@@ -21,7 +23,7 @@ pub use into::IntoIteratorFixed;
 /// length. This enables us to turn them back into collections of fixed size without having to
 /// perform unnecessary checks during run time.
 ///
-/// Just like Iterator, IteratorFixed provides a lot of methods like:
+/// Just like Iterator, `IteratorFixed` provides a lot of methods like:
 ///
 /// * `map`
 /// * `inspect`
@@ -42,9 +44,9 @@ pub struct IteratorFixed<I: Iterator, const N: usize> {
 
 /// Creates a new iterator of fixed size where each iteration calls the provided closure F: FnMut(usize) -> T
 ///
-/// This allows very simple initialization of types that implement `FromIteratorFixed` such as arrays.
+/// This allows very simple initialization of types that implement [`FromIteratorFixed`] such as arrays.
 ///
-/// Note: This function is quite similar to [`iter::from_fn`] however note that in contrast to `iter::from_fn`,
+/// Note: This function is quite similar to [`iter::from_fn`] however note that in contrast to [`iter::from_fn`],
 /// in `IteratorFixed::from_fn` the provided function does not have any say in the number of elements.
 /// The length is entirely determined by `N`.
 ///
