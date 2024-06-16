@@ -5,6 +5,7 @@
 // enable additionnal lints
 #![warn(clippy::doc_markdown)]
 #![warn(clippy::ignored_unit_patterns)]
+#![warn(clippy::use_self)]
 
 use core::iter;
 
@@ -78,7 +79,7 @@ where
     ///
     // TODO: Would it be ok if it generated more elements?
     pub unsafe fn from_iter<II: IntoIterator<IntoIter = I>>(i: II) -> Self {
-        IteratorFixed {
+        Self {
             inner: i.into_iter(),
         }
     }
