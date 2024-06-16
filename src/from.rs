@@ -57,6 +57,7 @@ impl<T, const N: usize> FromIteratorFixed<T, N> for [T; N] {
     /// let a: [i32; 3] = two_four_six.collect();
     /// assert_eq!(a, [2, 4, 6]);
     /// ```
+    #[inline]
     fn from_iter_fixed<I: Iterator<Item = T>>(iter_fixed: IteratorFixed<I, N>) -> Self {
         let IteratorFixed { inner: mut it } = iter_fixed;
         // We know that it will yield N elements due to it originating from an IteratorFixed

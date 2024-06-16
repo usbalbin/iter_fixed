@@ -35,7 +35,7 @@ pub unsafe trait IntoIteratorFixed<const N: usize> {
 // IteratorFixed implements IntoIteratorFixed
 unsafe impl<I: Iterator, const N: usize> IntoIteratorFixed<N> for IteratorFixed<I, N>
 where
-    IteratorFixed<I, N>: IntoIterator,
+    Self: IntoIterator,
 {
     type Item = I::Item;
     type IntoIter = I;
@@ -51,6 +51,7 @@ where
     ///
     /// assert_eq!(zipped, [(1, 1), (2, 1)]);
     /// ```
+    #[inline]
     fn into_iter_fixed(self) -> IteratorFixed<Self::IntoIter, N> {
         self
     }
@@ -71,6 +72,7 @@ unsafe impl<T, const N: usize> IntoIteratorFixed<N> for [T; N] {
     /// let a: [i32; 3] = two_four_six.collect();
     /// assert_eq!(a, [2, 4, 6]);
     /// ```
+    #[inline]
     fn into_iter_fixed(self) -> IteratorFixed<array::IntoIter<T, N>, N> {
         // Safety: array::IntoIter::new([T; N]) always yields N elements
         unsafe { IteratorFixed::from_iter(<[T; N] as IntoIterator>::into_iter(self)) }
@@ -93,6 +95,7 @@ unsafe impl<'a, T, const N: usize> IntoIteratorFixed<N> for &'a [T; N] {
     /// }
     /// assert_eq!(double(&[1, 2, 3]), [2, 4, 6]);
     /// ```
+    #[inline]
     fn into_iter_fixed(self) -> IteratorFixed<Self::IntoIter, N> {
         // Safety: [T; N]::iter always yields N elements
         unsafe { IteratorFixed::from_iter(self.iter()) }
@@ -123,6 +126,7 @@ unsafe impl<'a, T, const N: usize> IntoIteratorFixed<N> for &'a mut [T; N] {
     /// assert_eq!(double(&mut a), [1, 2, 3]);
     /// assert_eq!(a, [2, 4, 6]);
     /// ```
+    #[inline]
     fn into_iter_fixed(self) -> IteratorFixed<Self::IntoIter, N> {
         // Safety: [T; N]::iter always yields N elements
         unsafe { IteratorFixed::from_iter(self.iter_mut()) }
@@ -131,7 +135,7 @@ unsafe impl<'a, T, const N: usize> IntoIteratorFixed<N> for &'a mut [T; N] {
 
 unsafe impl<T: Clone, const N: usize> IntoIteratorFixed<N> for iter::Repeat<T> {
     type Item = T;
-    type IntoIter = iter::Take<iter::Repeat<T>>;
+    type IntoIter = iter::Take<Self>;
 
     /// Creates a fixed size iterator from an [`core::iter::Repeat`]
     ///
@@ -145,7 +149,8 @@ unsafe impl<T: Clone, const N: usize> IntoIteratorFixed<N> for iter::Repeat<T> {
     /// let a: [i32; 3] = one_one_one.collect();
     /// assert_eq!(a, [1, 1, 1]);
     /// ```
-    fn into_iter_fixed(self) -> IteratorFixed<iter::Take<iter::Repeat<T>>, N> {
+    #[inline]
+    fn into_iter_fixed(self) -> IteratorFixed<iter::Take<Self>, N> {
         // Safety: iter::repeat(_).take(N) always yields N elements
         unsafe { IteratorFixed::from_iter(self.take(N)) }
     }
