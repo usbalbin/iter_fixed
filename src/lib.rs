@@ -69,21 +69,27 @@ pub use into::IntoIteratorFixed;
 /// length. This enables us to turn them back into collections of fixed size without having to
 /// perform unnecessary checks during run time.
 ///
-/// Just like Iterator, `IteratorFixed` provides a lot of methods like:
-///
-/// * `map`
-/// * `inspect`
-/// * `skip`
-/// * `step_by`
-/// * `chain`
-/// * `enumerate`
-/// * `take`
-/// * `zip`
-/// * `rev`
-/// * `copied`
-/// * `cloned`
+/// Just like [`Iterator`], [`IteratorFixed`] provides a lot of methods like:
+/// - available on stable rust:  
+///   [`map`], [`inspect`], [`enumerate`], [`zip`], [`rev`], [`copied`], [`cloned`]
+///     
+/// - requires nightly compiler and enable `nightly_features`:  
+///   [`skip`], [`step_by`], [`chain`], [`take`], [`flatten`]
 ///
 /// however it does not support methods like `filter` or `take_while` which will affect the length during runtime.
+///
+/// [`map`]: IteratorFixed::map
+/// [`inspect`]: IteratorFixed::inspect
+/// [`enumerate`]: IteratorFixed::enumerate
+/// [`zip`]: IteratorFixed::zip
+/// [`rev`]: IteratorFixed::rev
+/// [`copied`]: IteratorFixed::copied
+/// [`cloned`]: IteratorFixed::cloned
+/// [`skip`]: IteratorFixed::skip
+/// [`step_by`]: IteratorFixed::step_by
+/// [`chain`]: IteratorFixed::chain
+/// [`take`]: IteratorFixed::take
+/// [`flatten`]: IteratorFixed::flatten
 pub struct IteratorFixed<I: Iterator, const N: usize> {
     inner: I,
 }
