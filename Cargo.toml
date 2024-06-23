@@ -9,6 +9,9 @@ description = "Iterator of fixed length"
 keywords = ["iterator", "array", "data-structure", "zip"]
 categories = ["rust-patterns", "no-std"]
 
+[badges]
+maintenance = { status = "experimental" }
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [features]

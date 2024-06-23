@@ -1,3 +1,46 @@
+//! Provides a type and traits for turning collections of fixed size, like arrays,
+//! into [`IteratorFixed`] which can be used a bit like an ordinary [`Iterator`] but
+//! with a compile time guaranteed length. This enables us to turn them back into
+//! collections of fixed size without having to perform unnecessary checks during
+//! run time.
+//!
+//! [`IteratorFixed`] provides on stable methods like `map`, `inspect`, `enumerate`,
+//!  `zip`, `rev`, `copied`, `cloned`, with nightly `skip`, `step_by`, `chain`, `take`,
+//!  `flatten`.
+//!
+//! However it does not and will never be able to support methods like
+//!  `filter` or `take_while` which will affect the length during runtime.
+//!
+//! # ⚠️ Experimental
+//! *This code is currently very experimental, type names, function names, trait bounds etc. are all very much subject to change.*
+//!
+//! # Origin
+//! *This project is inspired by @leonardo-m 's idea <https://github.com/rust-lang/rust/issues/80094#issuecomment-749260428>*
+//!
+//! # Examples:
+//! ```
+//! # use crate::iter_fixed::IntoIteratorFixed;
+//! // simply reverse an Array
+//! let rev_array: [_; 4] = [1, 3, 2, 7]
+//!     .into_iter_fixed()
+//!     .rev()
+//!     .collect();
+//! assert_eq!(rev_array, [7, 2, 3, 1]);
+//!
+//! // .. and compute sum with values of a second array multiplied by 10
+//! let sum_array: [_; 4] = rev_array
+//!     .into_iter_fixed()
+//!     .zip([4,1,3,7])
+//!     .map(|(a, b)| a + (b * 10))
+//!     .collect();
+//! assert_eq!(sum_array, [47, 12, 33, 71]);
+//! ```
+//!
+//! You can also take a look at examples : [`matrix.rs`] and [`vector.rs`]
+//!
+//! [`matrix.rs`]: source/examples/matrix.rs
+//! [`vector.rs`]: source/examples/vector.rs
+//!
 #![no_std]
 #![allow(stable_features)]
 #![cfg_attr(feature = "nightly_features", allow(incomplete_features))]
@@ -26,21 +69,27 @@ pub use into::IntoIteratorFixed;
 /// length. This enables us to turn them back into collections of fixed size without having to
 /// perform unnecessary checks during run time.
 ///
-/// Just like Iterator, `IteratorFixed` provides a lot of methods like:
-///
-/// * `map`
-/// * `inspect`
-/// * `skip`
-/// * `step_by`
-/// * `chain`
-/// * `enumerate`
-/// * `take`
-/// * `zip`
-/// * `rev`
-/// * `copied`
-/// * `cloned`
+/// Just like [`Iterator`], [`IteratorFixed`] provides a lot of methods like:
+/// - available on stable rust:  
+///   [`map`], [`inspect`], [`enumerate`], [`zip`], [`rev`], [`copied`], [`cloned`]
+///     
+/// - requires nightly compiler and enable `nightly_features`:  
+///   [`skip`], [`step_by`], [`chain`], [`take`], [`flatten`]
 ///
 /// however it does not support methods like `filter` or `take_while` which will affect the length during runtime.
+///
+/// [`map`]: IteratorFixed::map
+/// [`inspect`]: IteratorFixed::inspect
+/// [`enumerate`]: IteratorFixed::enumerate
+/// [`zip`]: IteratorFixed::zip
+/// [`rev`]: IteratorFixed::rev
+/// [`copied`]: IteratorFixed::copied
+/// [`cloned`]: IteratorFixed::cloned
+/// [`skip`]: IteratorFixed::skip
+/// [`step_by`]: IteratorFixed::step_by
+/// [`chain`]: IteratorFixed::chain
+/// [`take`]: IteratorFixed::take
+/// [`flatten`]: IteratorFixed::flatten
 pub struct IteratorFixed<I: Iterator, const N: usize> {
     inner: I,
 }
