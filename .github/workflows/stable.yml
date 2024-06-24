@@ -30,10 +30,8 @@ jobs:
           override: true
       - name: Install cargo-readme
         run: cargo install cargo-readme
-      - name: Generate Readme for comparison
-        run: cargo readme > README_.md
       - name: Check if readme is up to date
-        run: diff README.md README_.md
+        run: diff README.md <(cargo readme)
 
   test:
     name: Test Suite
