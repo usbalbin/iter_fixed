@@ -22,7 +22,6 @@ fn test() {
     assert_eq!(res, [(1, 42), (2, 42), (3, 42)]);
 }
 
-#[cfg(feature = "nightly_features")]
 #[test]
 fn test_changing_length() {
     let res: [_; 3] = [1, 2, 3, 4].into_iter_fixed().skip::<1>().collect();
@@ -59,14 +58,17 @@ fn test_changing_length() {
 
     assert_eq!(res, [1, 2, 3, 4]);
 
-    let res: [_; 6] = [1, 2, 3].into_iter_fixed().flat_map(|x| [x, x]).collect();
+    #[cfg(feature = "nightly_features")]
+    {
+        let res: [_; 6] = [1, 2, 3].into_iter_fixed().flat_map(|x| [x, x]).collect();
 
-    assert_eq!(res, [1, 1, 2, 2, 3, 3]);
+        assert_eq!(res, [1, 1, 2, 2, 3, 3]);
 
-    let res: [_; 6] = [1, 2, 3]
-        .into_iter_fixed()
-        .flat_map(|x| IntoIteratorFixed::<2>::into_iter_fixed(core::iter::repeat(x)))
-        .collect();
+        let res: [_; 6] = [1, 2, 3]
+            .into_iter_fixed()
+            .flat_map(|x| IntoIteratorFixed::<2>::into_iter_fixed(core::iter::repeat(x)))
+            .collect();
 
-    assert_eq!(res, [1, 1, 2, 2, 3, 3]);
+        assert_eq!(res, [1, 1, 2, 2, 3, 3]);
+    }
 }
