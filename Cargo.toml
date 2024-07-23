@@ -19,3 +19,5 @@ default = []
 nightly_features = []
 
 [dependencies]
+typenum = { version = "1.17.0", features = ["const-generics"] }
+typenum_mappings = "0.1.0"

@@ -51,17 +51,26 @@
 #![warn(clippy::missing_inline_in_public_items)]
 #![warn(clippy::use_self)]
 
-use core::iter;
+use core::{
+    iter,
+    ops::{Add, Div, Mul, Not, Rem, Sub},
+};
 
 mod from;
 mod helpers;
 mod into;
 
-#[cfg(feature = "nightly_features")]
-use helpers::{ceiling_div, min, sub_or_zero};
+use helpers::*;
 
 pub use from::FromIteratorFixed;
 pub use into::IntoIteratorFixed;
+use typenum::{Const, Eq, IsEqual, Min, Mod, ToUInt, U, U0};
+
+type FlattenIter<I, IIF, const M: usize> = iter::FlatMap<
+    I,
+    IteratorFixed<<IIF as IntoIteratorFixed<M>>::IntoIter, M>,
+    fn(IIF) -> IteratorFixed<<IIF as IntoIteratorFixed<M>>::IntoIter, M>,
+>;
 
 /// Iterator of fixed size
 ///
@@ -71,10 +80,10 @@ pub use into::IntoIteratorFixed;
 ///
 /// Just like [`Iterator`], [`IteratorFixed`] provides a lot of methods like:
 /// - available on stable rust:  
-///   [`map`], [`inspect`], [`enumerate`], [`zip`], [`rev`], [`copied`], [`cloned`]
+///   [`map`], [`inspect`], [`enumerate`], [`zip`], [`rev`], [`copied`], [`cloned`], [`skip`], [`step_by`], [`chain`], [`take`], [`flatten`]
 ///     
 /// - requires nightly compiler and enable `nightly_features`:  
-///   [`skip`], [`step_by`], [`chain`], [`take`], [`flatten`]
+///   [`flat_map`]
 ///
 /// however it does not support methods like `filter` or `take_while` which will affect the length during runtime.
 ///
@@ -90,6 +99,7 @@ pub use into::IntoIteratorFixed;
 /// [`chain`]: IteratorFixed::chain
 /// [`take`]: IteratorFixed::take
 /// [`flatten`]: IteratorFixed::flatten
+/// [`flat_map`]: IteratorFixed::flat_map
 pub struct IteratorFixed<I: Iterator, const N: usize> {
     inner: I,
 }
@@ -160,40 +170,52 @@ where
 
     // TODO: what should happen when SKIP > N?
     /// See [`core::iter::Iterator::skip`]
-    #[cfg(feature = "nightly_features")]
     #[inline]
-    pub fn skip<const SKIP: usize>(
-        self,
-    ) -> IteratorFixed<impl Iterator<Item = I::Item>, { sub_or_zero(N, SKIP) }> {
-        IteratorFixed {
-            inner: self.inner.skip(SKIP),
-        }
+    pub fn skip<const SKIP: usize>(self) -> RunTypeNumToFixedIter<iter::Skip<I>, RunSub<N, SKIP>>
+    where
+        Const<N>: ToUInt,
+        Const<SKIP>: ToUInt,
+
+        U<N>: Sub<U<SKIP>, Output: TypenumToFixedIter<iter::Skip<I>>>,
+    {
+        unsafe { ErasedIterFixed::new(self.inner.skip(SKIP)) }
     }
 
     /// See [`core::iter::Iterator::step_by`]
-    #[cfg(feature = "nightly_features")]
     #[inline]
     pub fn step_by<const STEP: usize>(
         self,
-    ) -> IteratorFixed<impl Iterator<Item = I::Item>, { ceiling_div(N, STEP) }> {
-        IteratorFixed {
-            inner: self.inner.step_by(STEP),
-        }
+    ) -> RunTypeNumToFixedIter<iter::StepBy<I>, RunCelDiv<N, STEP>>
+    where
+        Const<N>: ToUInt,
+        Const<STEP>: ToUInt,
+
+        U<N>: Rem<U<STEP>, Output: IsEqual<U0, Output: Not>>,
+        U<N>: Div<
+            U<STEP>,
+            Output: Add<
+                TyNot<Eq<Mod<U<N>, U<STEP>>, U0>>,
+                Output: TypenumToFixedIter<iter::StepBy<I>>,
+            >,
+        >,
+    {
+        unsafe { ErasedIterFixed::new(self.inner.step_by(STEP)) }
     }
 
     /// See [`core::iter::Iterator::chain`]
-    #[cfg(feature = "nightly_features")]
     #[inline]
     pub fn chain<IIF, const M: usize>(
         self,
         other: IIF,
-    ) -> IteratorFixed<impl Iterator<Item = I::Item>, { N + M }>
+    ) -> RunTypeNumToFixedIter<iter::Chain<I, IIF::IntoIter>, RunAdd<N, M>>
     where
+        Const<N>: ToUInt,
+        Const<M>: ToUInt,
+
         IIF: IntoIteratorFixed<M, Item = I::Item>,
+        U<N>: Add<U<M>, Output: TypenumToFixedIter<iter::Chain<I, IIF::IntoIter>>>,
     {
-        IteratorFixed {
-            inner: self.inner.chain(other.into_iter_fixed().inner),
-        }
+        unsafe { ErasedIterFixed::new(self.inner.chain(other.into_iter_fixed().inner)) }
     }
 
     /// See [`core::iter::Iterator::enumerate`]
@@ -205,14 +227,15 @@ where
     }
 
     /// See [`core::iter::Iterator::take`]
-    #[cfg(feature = "nightly_features")]
     #[inline]
-    pub fn take<const TAKE: usize>(
-        self,
-    ) -> IteratorFixed<impl Iterator<Item = I::Item>, { min(TAKE, N) }> {
-        IteratorFixed {
-            inner: self.inner.take(TAKE),
-        }
+    pub fn take<const TAKE: usize>(self) -> RunTypeNumToFixedIter<iter::Take<I>, RunMin<N, TAKE>>
+    where
+        Const<N>: ToUInt,
+        Const<TAKE>: ToUInt,
+
+        U<N>: Min<U<TAKE>, Output: TypenumToFixedIter<iter::Take<I>>>,
+    {
+        unsafe { ErasedIterFixed::new(self.inner.take(TAKE)) }
     }
 
     /// See [`core::iter::Iterator::zip`]
@@ -251,21 +274,22 @@ where
         }
     }
 
-    #[cfg(feature = "nightly_features")]
     #[inline]
     pub fn flatten<IIF, const M: usize>(
         self,
-    ) -> IteratorFixed<impl Iterator<Item = IIF::Item>, { M * N }>
+    ) -> RunTypeNumToFixedIter<FlattenIter<I, IIF, M>, RunMul<N, M>>
     where
+        Const<N>: ToUInt,
+        Const<M>: ToUInt,
+        U<N>: Mul<U<M>, Output: TypenumToFixedIter<FlattenIter<I, IIF, M>>>,
+
         I: Iterator<Item = IIF>,
         IIF: IntoIteratorFixed<M>,
     {
         // The call to into_iter_fixed is needed because we cannot trust that
         // let x: I::Item;
         // x.into_iterator() == x.into_iter_fixed().into_iterator()
-        IteratorFixed {
-            inner: self.inner.flat_map(IntoIteratorFixed::into_iter_fixed),
-        }
+        unsafe { ErasedIterFixed::new(self.inner.flat_map(IIF::into_iter_fixed as fn(_) -> _)) }
     }
 
     #[cfg(feature = "nightly_features")]
