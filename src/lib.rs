@@ -58,7 +58,7 @@ mod helpers;
 mod into;
 
 #[cfg(feature = "nightly_features")]
-use helpers::{ceiling_div, min, sub_or_zero};
+use helpers::{ceiling_div, min};
 
 pub use from::FromIteratorFixed;
 pub use into::IntoIteratorFixed;
@@ -164,7 +164,7 @@ where
     #[inline]
     pub fn skip<const SKIP: usize>(
         self,
-    ) -> IteratorFixed<impl Iterator<Item = I::Item>, { sub_or_zero(N, SKIP) }> {
+    ) -> IteratorFixed<impl Iterator<Item = I::Item>, { N.saturating_sub(SKIP) }> {
         IteratorFixed {
             inner: self.inner.skip(SKIP),
         }
